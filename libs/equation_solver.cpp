@@ -1,26 +1,26 @@
 #include <equation_solver.hpp>
 
 namespace NEquationSolver {
-    IEquationSolver::IEquationSolver(const TSolverParameters& params) : Parameters(params) {
-        Parameters.SpaceCount = static_cast<usize>((Parameters.RightBound - Parameters.LeftBound) / Parameters.SpaceStep);
-        Parameters.TimeCount = static_cast<usize>(Parameters.MaxTime / Parameters.TimeStep);
+    IEquationSolver::IEquationSolver(const TSolverConfig& config) : Config(config) {
+        Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep);
+        Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep);
         MemoGAlpha[0] = 1.0;
         MemoGGamma[0] = 1.0;
     }
 
-    IEquationSolver::IEquationSolver(TSolverParameters&& params) : Parameters(std::move(params)) {
-        Parameters.SpaceCount = static_cast<usize>((Parameters.RightBound - Parameters.LeftBound) / Parameters.SpaceStep);
-        Parameters.TimeCount = static_cast<usize>(Parameters.MaxTime / Parameters.TimeStep);
+    IEquationSolver::IEquationSolver(TSolverConfig&& config) : Config(std::move(config)) {
+        Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep);
+        Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep);
         MemoGAlpha[0] = 1.0;
         MemoGGamma[0] = 1.0;
     }
 
-    IEquationSolver::IEquationSolver(const IEquationSolver& solver) : Parameters(solver.Parameters) {
+    IEquationSolver::IEquationSolver(const IEquationSolver& solver) : Config(solver.Config) {
         MemoGAlpha[0] = 1.0;
         MemoGGamma[0] = 1.0;
     }
 
-    IEquationSolver::IEquationSolver(IEquationSolver&& solver) : Parameters(std::move(solver.Parameters)) {
+    IEquationSolver::IEquationSolver(IEquationSolver&& solver) : Config(std::move(solver.Config)) {
         MemoGAlpha[0] = 1.0;
         MemoGGamma[0] = 1.0;
     }
@@ -30,7 +30,7 @@ namespace NEquationSolver {
     }
 
     double IEquationSolver::CoefG(double a, usize i) {
-        if (a != Parameters.Alpha && a != Parameters.Gamma) {
+        if (a != Config.Alpha && a != Config.Gamma) {
             throw "ERROR: g function using memoization only for \"alpha\" and \"gamma\". If you need more use comments below\n";
 
             /*
@@ -41,59 +41,59 @@ namespace NEquationSolver {
             */
         }
 
-        if (a == Parameters.Alpha) {
+        if (a == Config.Alpha) {
             if (MemoGAlpha.find(i) == MemoGAlpha.end()) {
-                MemoGAlpha[i] = (static_cast<double>(i) - 1.0 - Parameters.Alpha) / static_cast<double>(i) * CoefG(a, i - 1);
+                MemoGAlpha[i] = (static_cast<double>(i) - 1.0 - Config.Alpha) / static_cast<double>(i) * CoefG(a, i - 1);
             }
 
             return MemoGAlpha[i];
         } 
         
         if (MemoGGamma.find(i) == MemoGGamma.end()) {
-            MemoGGamma[i] = (static_cast<double>(i) - 1.0 - Parameters.Gamma) / static_cast<double>(i) * CoefG(a, i - 1);
+            MemoGGamma[i] = (static_cast<double>(i) - 1.0 - Config.Gamma) / static_cast<double>(i) * CoefG(a, i - 1);
         }
 
         return MemoGGamma[i];
     }
 
     double IEquationSolver::Space(usize i) {
-        return Parameters.LeftBound + static_cast<double>(i) * Parameters.SpaceStep;
+        return Config.LeftBound + static_cast<double>(i) * Config.SpaceStep;
     }
 
-    double IEquationSolver::Time(usize i) {
-        return Parameters.TimeStep * static_cast<double>(i);
+    double IEquationSolver::Time(usize j) {
+        return Config.TimeStep * static_cast<double>(j);
     }
 
     double IEquationSolver::CoefA(double x) {
-        return (1.0 + Parameters.Beta) 
-        * (Parameters.DiffusionCoefficient(x) / 2.0) 
-        * (std::pow(Parameters.TimeStep, Parameters.Gamma) / std::pow(Parameters.SpaceStep, Parameters.Alpha));
+        return (1.0 + Config.Beta) 
+        * (Config.DiffusionCoefficient(x) / 2.0) 
+        * (std::pow(Config.TimeStep, Config.Gamma) / std::pow(Config.SpaceStep, Config.Alpha));
     }
 
     double IEquationSolver::CoefB(double x) {
-        return (1.0 - Parameters.Beta) 
-        * (Parameters.DiffusionCoefficient(x) / 2.0) 
-        * (std::pow(Parameters.TimeStep, Parameters.Gamma) / std::pow(Parameters.SpaceStep, Parameters.Alpha));
+        return (1.0 - Config.Beta) 
+        * (Config.DiffusionCoefficient(x) / 2.0) 
+        * (std::pow(Config.TimeStep, Config.Gamma) / std::pow(Config.SpaceStep, Config.Alpha));
     }
 
     double IEquationSolver::CoefC(double x) {
-        return Parameters.DemolitionCoefficient(x) * std::pow(Parameters.TimeStep, Parameters.Gamma) / 2.0 / Parameters.SpaceStep;
+        return Config.DemolitionCoefficient(x) * std::pow(Config.TimeStep, Config.Gamma) / 2.0 / Config.SpaceStep;
     }
 }
 
-std::ostream& NEquationSolver::operator<<(std::ostream& out, const NEquationSolver::TSolverParameters& parameters) {
+std::ostream& NEquationSolver::operator<<(std::ostream& out, const NEquationSolver::TSolverConfig& config) {
 
-    out << "Space count N:\t\t"       << parameters.SpaceCount << Endl;
-    out << "Time count K:\t\t"        << parameters.TimeCount << Endl;
-    out << "Left bound L:\t\t"        << parameters.LeftBound << Endl;
-    out << "Right bound R:\t\t"       << parameters.RightBound << Endl;
-    out << "Max time:\t\t"            << parameters.MaxTime << Endl;
-    out << "Alpha:\t\t\t"             << parameters.Alpha << Endl;
-    out << "Gamma:\t\t\t"             << parameters.Gamma << Endl;
-    out << "Space step:\t\t"          << parameters.SpaceStep << Endl;
-    out << "Time step:\t\t"           << parameters.TimeStep << Endl;
-    out << "Beta:\t\t\t"              << parameters.Beta << Endl;
-    out << "Borders available:\t"     << parameters.BordersAvailable;
+    out << "Space count N:\t\t"       << config.SpaceCount << Endl;
+    out << "Time count K:\t\t"        << config.TimeCount << Endl;
+    out << "Left bound L:\t\t"        << config.LeftBound << Endl;
+    out << "Right bound R:\t\t"       << config.RightBound << Endl;
+    out << "Max time:\t\t"            << config.MaxTime << Endl;
+    out << "Alpha:\t\t\t"             << config.Alpha << Endl;
+    out << "Gamma:\t\t\t"             << config.Gamma << Endl;
+    out << "Space step:\t\t"          << config.SpaceStep << Endl;
+    out << "Time step:\t\t"           << config.TimeStep << Endl;
+    out << "Beta:\t\t\t"              << config.Beta << Endl;
+    out << "Borders available:\t"     << config.BordersAvailable;
 
     return out;
 }

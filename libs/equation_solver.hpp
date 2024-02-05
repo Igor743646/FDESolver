@@ -9,10 +9,11 @@
 #include <unordered_map>
 #include <iostream>
 #include <utils/utils.hpp>
+#include <linalg/matrix.hpp>
 
 namespace NEquationSolver {
     
-    struct TSolverParameters {
+    struct TSolverConfig {
         usize SpaceCount, TimeCount;    // количество ячеек по x и t координатах соответственно
 
         double LeftBound, RightBound;   // границы отрезка сетки по x координате
@@ -33,37 +34,44 @@ namespace NEquationSolver {
 
         bool BordersAvailable;           // стоит ли учитывать граничные условия
 
-        friend std::ostream& operator<<(std::ostream&, const TSolverParameters&);
+        friend std::ostream& operator<<(std::ostream&, const TSolverConfig&);
     };
 
     class IEquationSolver {
     protected:
-        TSolverParameters Parameters;
+        TSolverConfig Config;
         std::unordered_map<usize, double> MemoGAlpha;
         std::unordered_map<usize, double> MemoGGamma;
 
     public:
 
-        using TResult = std::vector<std::vector<double>>;
+        using TResult = NLinalg::TMatrix;
 
-        IEquationSolver(const TSolverParameters&);
-        IEquationSolver(TSolverParameters&&);
+        IEquationSolver(const TSolverConfig&);
+        IEquationSolver(TSolverConfig&&);
         IEquationSolver(const IEquationSolver&);
         IEquationSolver(IEquationSolver&&);
         virtual ~IEquationSolver();
 
+        /// @brief Возвращает x координату
+        /// @param  i номер шага по пространственной координате
+        /// @return x(i) = LeftBound + i * SpaceStep
         double Space(usize);
+
+        /// @brief Возвращает t координату
+        /// @param  j номер шага по временной координате
+        /// @return t(j) = j * TimeStep
         double Time(usize);
         double CoefA(double);
         double CoefB(double);
         double CoefC(double);
         double CoefG(double, usize);
 
-        virtual TResult Solve() const = 0;
+        virtual TResult Solve() = 0;
 
         friend std::ostream& operator<<(std::ostream& out, const IEquationSolver& solver) {
 
-            out << "Parameters:\n" << solver.Parameters << Endl;
+            out << "Parameters:\n" << solver.Config << Endl;
             out << "MemoGAlpha:\n" << solver.MemoGAlpha << Endl;
             out << "MemoGGamma:\n" << solver.MemoGGamma << Endl;
 

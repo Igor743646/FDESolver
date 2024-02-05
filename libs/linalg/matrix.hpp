@@ -1,6 +1,7 @@
 #pragma once
 
 #include <utils/utils.hpp>
+#include <fstream>
 
 namespace NLinalg {
     class TMatrix {
@@ -20,28 +21,22 @@ namespace NLinalg {
 
         static TMatrix E(usize);
         std::tuple<TMatrix, TMatrix, TMatrix> LUFactorizing();
+
+        /// @brief Метод решения линейного матричного уравнения через PLU разложение \\
+        /// @brief Ax = b => PLUx = b => LUx = P^(-1)b = P^(T)b
+        /// @param b вектор значений с правой стороны уравнения
+        /// @exception Метод вызывает исключение, если матрица не квадратная
+        /// @return Возвращает x - решение системы уравнений вида Ax = b 
         std::optional<std::vector<double>> Solve(const std::vector<double>&);
+
         const double* operator[](usize) const;
         double* operator[](usize);
         friend TMatrix operator*(const TMatrix&, const TMatrix&);
         friend std::vector<double> operator*(const std::vector<double>&, const TMatrix&);
 
-        friend std::ostream& operator<<(std::ostream& out, const TMatrix& m) {
-            out << std::fixed;
-            out.precision(2);
-            out << "[";
-            for (usize i = 0; i < m.Rows; i++) {
-                out << ((i == 0) ? "[" : " [");
-                for (usize j = 0; j < m.Columns; j++) {
-                    out << m[i][j];
-                    out << ((j + 1 < m.Columns) ? " " : "");
-                }
-
-                out << ((i + 1 < m.Rows) ? "]\n" : "]");
-            }
-            out << "]";
-            return out;
-        }
+        friend std::ostream& operator<<(std::ostream& out, const TMatrix& m);
+        void WriteText(std::ofstream& out) const;
+        void WriteBinary(std::ofstream& out) const;
 
     private:
 

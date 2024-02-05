@@ -148,26 +148,14 @@ namespace NLinalg {
         return result;
     }
 
-    /// @brief Метод решения линейного матричного уравнения через PLU разложение \\
-    /// @brief Ax = b => PLUx = b => LUx = P^(-1)b = P^(T)b
-    /// @param b вектор значений с правой стороны уравнения
-    /// @exception Метод вызывает исключение, если матрица не квадратная
-    /// @return Возвращает x - решение системы уравнений вида Ax = b 
     std::optional<std::vector<double>> TMatrix::Solve(const std::vector<double>& b) {
         assert(Rows == Columns && Columns == b.size());
 
         // 1. Делаем LU - разложение
         auto [P, L, U] = LUFactorizing();
 
-        std::cout << P << std::endl;
-        std::cout << L << std::endl;
-        std::cout << U << std::endl;
-
-
         // 2. Вычисляем P^(T)b = bP = y (1 x n)
         auto y = b * P;
-
-        std::cout << y << std::endl;
 
         // 3. Вычисляем L * z = y;
         std::vector<double> z(Columns, 0.0);
@@ -181,8 +169,6 @@ namespace NLinalg {
 
             z[i] /= L[i][i];
         }
-
-        std::cout << z << std::endl;
 
         // 4. Вычисляем U * x = z
         std::vector<double> x(Columns, 0.0);
@@ -211,5 +197,38 @@ namespace NLinalg {
         }
 
         return matrix;
+    }
+
+    std::ostream& operator<<(std::ostream& out, const TMatrix& m) {
+        out << std::fixed;
+        out.precision(2);
+        out << "[";
+        for (usize i = 0; i < m.Rows; i++) {
+            out << ((i == 0) ? "[" : " [");
+            for (usize j = 0; j < m.Columns; j++) {
+                out << m[i][j];
+                out << ((j + 1 < m.Columns) ? " " : "");
+            }
+
+            out << ((i + 1 < m.Rows) ? "]\n" : "]");
+        }
+        out << "]";
+        return out;
+    }
+
+    void TMatrix::WriteText(std::ofstream& out) const {
+        out << Rows << " " << Columns << Endl;
+        for (usize i = 0; i < Rows; i++) {
+            for (usize j = 0; j < Columns; j++) {
+                out << Matrix[i * Columns + j] << ' ';
+            }
+
+            out << Endl;
+        }
+    }
+
+    void TMatrix::WriteBinary(std::ofstream& out) const {
+        out << Rows << Columns;
+        out.write(reinterpret_cast<char*>(Matrix), sizeof(double) * Rows * Columns);
     }
 }

@@ -33,4 +33,5 @@ namespace NLogger {
 
 #define INFO_LOG NLogger::TLogHelper{}
 #define DEBUG_LOG NLogger::TLogHelper{}
+#define ERROR_LOG NLogger::TLogHelper{}
 #define Endl '\n'

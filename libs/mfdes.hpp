@@ -11,9 +11,9 @@ namespace NEquationSolver {
 
     public:
 
-        TModifiedFDES(const TSolverParameters&);
-        TModifiedFDES(TSolverParameters&&);
-        virtual TResult Solve() const;
+        TModifiedFDES(const TSolverConfig&);
+        TModifiedFDES(TSolverConfig&&);
+        virtual TResult Solve();
         
     };
 
