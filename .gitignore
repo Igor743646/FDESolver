@@ -397,4 +397,7 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+# my git ignore
 build/
+.vscode/settings.json
+.vscode/
