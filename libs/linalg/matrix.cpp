@@ -1,8 +1,12 @@
 #include <matrix.hpp>
 #include <cassert>
 #include <optional>
+#include <intrin.h>
 
 namespace NLinalg {
+
+    TMatrix::TMatrix() 
+    : Rows(0), Columns(0), Matrix(nullptr) {}
 
     TMatrix::TMatrix(usize rows, usize columns, double fill) 
     : Rows(rows), Columns(columns) {
@@ -27,6 +31,29 @@ namespace NLinalg {
     TMatrix::TMatrix(const std::vector<double>& v) 
     : TMatrix(1, v.size()) {
         std::memcpy(Matrix, v.data(), Rows * Columns * sizeof(double));
+    }
+
+    TMatrix& TMatrix::operator=(const TMatrix& matrix) {
+        Rows = matrix.Rows;
+        Columns = matrix.Columns;
+
+        if (Matrix) {
+            delete[] Matrix;
+        }
+
+        Matrix = new double[Rows * Columns];
+        std::memcpy(Matrix, matrix.Matrix, Rows * Columns * sizeof(double));
+
+        return *this;
+    }
+
+    TMatrix& TMatrix::operator=(TMatrix&& matrix) {
+        Rows = matrix.Rows;
+        Columns = matrix.Columns;
+        Matrix = matrix.Matrix;
+        matrix.Matrix = nullptr;
+
+        return *this;
     }
 
     TMatrix::~TMatrix() {
@@ -152,31 +179,42 @@ namespace NLinalg {
         assert(Rows == Columns && Columns == b.size());
 
         // 1. Делаем LU - разложение
-        auto [P, L, U] = LUFactorizing();
+        auto plu = LUFactorizing();
 
-        // 2. Вычисляем P^(T)b = bP = y (1 x n)
+        return TMatrix::Solve(plu, b);
+    }
+
+    std::optional<std::vector<double>> TMatrix::Solve(const std::tuple<TMatrix, TMatrix, TMatrix>& plu, const std::vector<double>& b) {
+        auto& [P, L, U] = plu;
+
+        assert(P.Shape().first == P.Shape().second && P.Shape().second == b.size());
+        assert(L.Shape().first == L.Shape().second && L.Shape().second == b.size());
+        assert(U.Shape().first == U.Shape().second && U.Shape().second == b.size());
+
+        // 1. Вычисляем P^(T)b = bP = y (1 x n)
         auto y = b * P;
 
-        // 3. Вычисляем L * z = y;
-        std::vector<double> z(Columns, 0.0);
-
-        for (usize i = 0; i < Rows; i++) {
-            z[i] = y[i];
-
+        // 2. Вычисляем L * z = y;
+        std::vector<double> z(std::move(y));
+        _mm_prefetch((const char*)z.data(), _MM_HINT_T1);
+        
+        for (usize i = 0; i < b.size(); i++) {
+            _mm_prefetch((const char*)L[i], _MM_HINT_T1);
             for (usize j = 0; j < i; j++) {
                 z[i] -= L[i][j] * z[j];
             }
 
-            z[i] /= L[i][i];
+            /* must be L[i][i] == 1 */
+            // z[i] /= L[i][i]; 
         }
 
-        // 4. Вычисляем U * x = z
-        std::vector<double> x(Columns, 0.0);
+        // 3. Вычисляем U * x = z
+        std::vector<double> x(std::move(z));
+        _mm_prefetch((const char*)x.data(), _MM_HINT_T1);
 
-        for (long i = Rows - 1; i >= 0; i--) {
-            x[i] = z[i];
-
-            for (usize j = i + 1; j < Columns; j++) {
+        for (usize i = b.size(); i-- > 0;) {
+            _mm_prefetch((const char*)U[i], _MM_HINT_T1);
+            for (usize j = i + 1; j < b.size(); j++) {
                 x[i] -= U[i][j] * x[j];
             }
 

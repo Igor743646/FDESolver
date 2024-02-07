@@ -1,28 +1,39 @@
 #include <equation_solver.hpp>
+#include <cassert>
 
 namespace NEquationSolver {
     IEquationSolver::IEquationSolver(const TSolverConfig& config) : Config(config) {
         Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep);
         Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep);
-        MemoGAlpha[0] = 1.0;
-        MemoGGamma[0] = 1.0;
+        PrefetchCoefG();
     }
 
     IEquationSolver::IEquationSolver(TSolverConfig&& config) : Config(std::move(config)) {
         Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep);
         Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep);
-        MemoGAlpha[0] = 1.0;
-        MemoGGamma[0] = 1.0;
+        PrefetchCoefG();
     }
 
     IEquationSolver::IEquationSolver(const IEquationSolver& solver) : Config(solver.Config) {
-        MemoGAlpha[0] = 1.0;
-        MemoGGamma[0] = 1.0;
+        PrefetchCoefG();
     }
 
     IEquationSolver::IEquationSolver(IEquationSolver&& solver) : Config(std::move(solver.Config)) {
-        MemoGAlpha[0] = 1.0;
-        MemoGGamma[0] = 1.0;
+        PrefetchCoefG();
+    }
+
+    void IEquationSolver::PrefetchCoefG() {
+        GAlpha.resize(Config.SpaceCount + 2);
+        GGamma.resize(Config.TimeCount + 2);
+        GAlpha[0] = GGamma[0] = 1.0;
+
+        for (usize i = 1; i < Config.SpaceCount + 2; i++) {
+            GAlpha[i] = (static_cast<double>(i) - 1.0 - Config.Alpha) / static_cast<double>(i) * GAlpha[i - 1];
+        }
+
+        for (usize i = 1; i < Config.TimeCount + 2; i++) {
+            GGamma[i] = (static_cast<double>(i) - 1.0 - Config.Gamma) / static_cast<double>(i) * GGamma[i - 1];
+        }
     }
 
     IEquationSolver::~IEquationSolver() {
@@ -42,18 +53,22 @@ namespace NEquationSolver {
         }
 
         if (a == Config.Alpha) {
-            if (MemoGAlpha.find(i) == MemoGAlpha.end()) {
-                MemoGAlpha[i] = (static_cast<double>(i) - 1.0 - Config.Alpha) / static_cast<double>(i) * CoefG(a, i - 1);
-            }
-
-            return MemoGAlpha[i];
-        } 
-        
-        if (MemoGGamma.find(i) == MemoGGamma.end()) {
-            MemoGGamma[i] = (static_cast<double>(i) - 1.0 - Config.Gamma) / static_cast<double>(i) * CoefG(a, i - 1);
+            assert(i < GAlpha.size());
+            return GAlpha[i];
         }
 
-        return MemoGGamma[i];
+        assert(i < GGamma.size());
+        return GGamma[i];
+    }
+
+    double IEquationSolver::CoefGAlpha(usize i) {
+        assert(i < GAlpha.size());
+        return GAlpha[i];
+    }
+
+    double IEquationSolver::CoefGGamma(usize j) {
+        assert(j < GGamma.size());
+        return GGamma[j];
     }
 
     double IEquationSolver::Space(usize i) {

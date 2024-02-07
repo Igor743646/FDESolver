@@ -4,7 +4,7 @@ project(LinalgLib LANGUAGES CXX)
 include_directories("${PROJECT_SOURCE_DIR}/ut/")
 add_subdirectory("ut/")
 
-add_library(linalg OBJECT 
+add_library(linalg STATIC 
     matrix.cpp
 )
 

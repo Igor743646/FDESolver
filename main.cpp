@@ -17,6 +17,16 @@ void Test1() {
     std::cout << "m:\n" << m.Solve({2,-5,8}) << std::endl;
 }
 
+void CalculateTime(auto callback) {
+    auto start = std::chrono::system_clock::now();
+    callback();
+    auto stop = std::chrono::system_clock::now();
+
+    double time_ms = std::chrono::duration<double, std::milli>(stop - start).count();
+
+    INFO_LOG << time_ms << Endl;
+}
+
 int main() {
 
     Test1();
@@ -41,7 +51,11 @@ int main() {
 
     NEquationSolver::TModifiedFDES solver(config);
 
-    auto result = solver.Solve();
+    NLinalg::TMatrix result;
+
+    CalculateTime([&](){
+        result = solver.Solve();
+    });
 
     std::ofstream textFile("result.txt", std::ios_base::out | std::ios_base::trunc);
     std::ofstream binaryFile("result.bin", std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);

@@ -7,12 +7,15 @@ namespace NLinalg {
     class TMatrix {
     public:
 
+        TMatrix();
         TMatrix(usize, usize, double = 0.0);
         TMatrix(const TMatrix&);
         TMatrix(TMatrix&&);
         TMatrix(const std::vector<double>&);
         TMatrix(std::vector<double>&&);
         TMatrix(usize);
+        TMatrix& operator=(const TMatrix&);
+        TMatrix& operator=(TMatrix&&);
         ~TMatrix();
 
         std::pair<usize, usize> Shape() const;
@@ -28,6 +31,7 @@ namespace NLinalg {
         /// @exception Метод вызывает исключение, если матрица не квадратная
         /// @return Возвращает x - решение системы уравнений вида Ax = b 
         std::optional<std::vector<double>> Solve(const std::vector<double>&);
+        static std::optional<std::vector<double>> Solve(const std::tuple<TMatrix, TMatrix, TMatrix>&, const std::vector<double>&);
 
         const double* operator[](usize) const;
         double* operator[](usize);

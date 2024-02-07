@@ -40,8 +40,12 @@ namespace NEquationSolver {
     class IEquationSolver {
     protected:
         TSolverConfig Config;
-        std::unordered_map<usize, double> MemoGAlpha;
-        std::unordered_map<usize, double> MemoGGamma;
+        std::vector<double> GAlpha;
+        std::vector<double> GGamma;
+
+    private:
+
+        void PrefetchCoefG();
 
     public:
 
@@ -66,14 +70,16 @@ namespace NEquationSolver {
         double CoefB(double);
         double CoefC(double);
         double CoefG(double, usize);
+        double CoefGAlpha(usize);
+        double CoefGGamma(usize);
 
         virtual TResult Solve() = 0;
 
         friend std::ostream& operator<<(std::ostream& out, const IEquationSolver& solver) {
 
             out << "Parameters:\n" << solver.Config << Endl;
-            out << "MemoGAlpha:\n" << solver.MemoGAlpha << Endl;
-            out << "MemoGGamma:\n" << solver.MemoGGamma << Endl;
+            out << "GAlpha:\n" << solver.GAlpha << Endl;
+            out << "GGamma:\n" << solver.GGamma << Endl;
 
             return out;
         }
