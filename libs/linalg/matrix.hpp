@@ -7,12 +7,14 @@ namespace NLinalg {
     class TMatrix {
     public:
 
+        using TPluResult = std::tuple<std::vector<usize>, TMatrix>;
+
         TMatrix();
         TMatrix(usize, usize, double = 0.0);
+        TMatrix(usize, usize, const std::vector<double>&);
         TMatrix(const TMatrix&);
         TMatrix(TMatrix&&);
         TMatrix(const std::vector<double>&);
-        TMatrix(std::vector<double>&&);
         TMatrix(usize);
         TMatrix& operator=(const TMatrix&);
         TMatrix& operator=(TMatrix&&);
@@ -23,7 +25,7 @@ namespace NLinalg {
         void SwapColumns(usize, usize);
 
         static TMatrix E(usize);
-        std::tuple<TMatrix, TMatrix, TMatrix> LUFactorizing();
+        TPluResult LUFactorizing();
 
         /// @brief Метод решения линейного матричного уравнения через PLU разложение \\
         /// @brief Ax = b => PLUx = b => LUx = P^(-1)b = P^(T)b
@@ -31,7 +33,7 @@ namespace NLinalg {
         /// @exception Метод вызывает исключение, если матрица не квадратная
         /// @return Возвращает x - решение системы уравнений вида Ax = b 
         std::optional<std::vector<double>> Solve(const std::vector<double>&);
-        static std::optional<std::vector<double>> Solve(const std::tuple<TMatrix, TMatrix, TMatrix>&, const std::vector<double>&);
+        static std::optional<std::vector<double>> Solve(const TPluResult&, const std::vector<double>&);
 
         const double* operator[](usize) const;
         double* operator[](usize);

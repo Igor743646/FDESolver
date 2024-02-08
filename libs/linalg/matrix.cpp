@@ -12,6 +12,11 @@ namespace NLinalg {
     : Rows(rows), Columns(columns) {
         Matrix = new double[rows * columns](fill);
     }
+
+    TMatrix::TMatrix(usize rows, usize columns, const std::vector<double>& v)
+    : TMatrix(rows, columns) {
+        std::memcpy(Matrix, v.data(), Rows * Columns * sizeof(double));
+    }
     
     TMatrix::TMatrix(const TMatrix& matrix) 
     : TMatrix(matrix.Rows, matrix.Columns) {
@@ -127,13 +132,16 @@ namespace NLinalg {
         }
     }
 
-    std::tuple<TMatrix, TMatrix, TMatrix> TMatrix::LUFactorizing() {
+    TMatrix::TPluResult TMatrix::LUFactorizing() {
         assert(Columns == Rows);
 
-        std::tuple<TMatrix, TMatrix, TMatrix> result(E(Rows), E(Rows), TMatrix(*this));
-        TMatrix& P = std::get<0>(result);
-        TMatrix& L = std::get<1>(result);
-        TMatrix& U = std::get<2>(result);
+        std::vector<usize> P(Rows);
+        TMatrix L = E(Rows);
+        TMatrix U(*this);
+
+        for (usize i = 0; i < Rows; i++) {
+            P[i] = i;
+        }
 
         for (usize colId = 0; colId < Columns; colId++) {
 
@@ -152,7 +160,7 @@ namespace NLinalg {
 
                 // 2. Меняем строки в U и обновляем L.
                 if (rowMax != colId) {
-                    P.SwapColumns(colId, rowMax);
+                    std::swap(P[colId], P[rowMax]);
                     L.SwapRows(colId, rowMax);
                     L.SwapColumns(colId, rowMax);
                     U.SwapRows(colId, rowMax);
@@ -172,7 +180,11 @@ namespace NLinalg {
             }
         }
 
-        return result;
+        for (usize rowId = 0; rowId < Rows; rowId++) {
+            std::memcpy(&L[rowId][rowId], &U[rowId][rowId], (Columns - rowId) * sizeof(double));
+        }
+
+        return std::make_tuple(std::move(P), std::move(L));
     }
 
     std::optional<std::vector<double>> TMatrix::Solve(const std::vector<double>& b) {
@@ -184,44 +196,46 @@ namespace NLinalg {
         return TMatrix::Solve(plu, b);
     }
 
-    std::optional<std::vector<double>> TMatrix::Solve(const std::tuple<TMatrix, TMatrix, TMatrix>& plu, const std::vector<double>& b) {
-        auto& [P, L, U] = plu;
+    std::optional<std::vector<double>> TMatrix::Solve(const TPluResult& plu, const std::vector<double>& b) {
+        auto& [P, LU] = plu;
 
-        assert(P.Shape().first == P.Shape().second && P.Shape().second == b.size());
-        assert(L.Shape().first == L.Shape().second && L.Shape().second == b.size());
-        assert(U.Shape().first == U.Shape().second && U.Shape().second == b.size());
+        assert(P.size() == b.size());
+        assert(LU.Shape().first == LU.Shape().second && LU.Shape().second == b.size());
 
         // 1. Вычисляем P^(T)b = bP = y (1 x n)
-        auto y = b * P;
+        std::vector<double> y(b.size());
+        for (usize i = 0; i < b.size(); i++) {
+            y[i] = b[P[i]];
+        }
 
         // 2. Вычисляем L * z = y;
         std::vector<double> z(std::move(y));
-        _mm_prefetch((const char*)z.data(), _MM_HINT_T1);
+        // _mm_prefetch((const char*)z.data(), _MM_HINT_T1);
         
         for (usize i = 0; i < b.size(); i++) {
-            _mm_prefetch((const char*)L[i], _MM_HINT_T1);
+            // _mm_prefetch((const char*)L[i], _MM_HINT_T1);
             for (usize j = 0; j < i; j++) {
-                z[i] -= L[i][j] * z[j];
+                z[i] -= LU[i][j] * z[j];
             }
 
             /* must be L[i][i] == 1 */
-            // z[i] /= L[i][i]; 
+            // z[i] /= L[i][i];
         }
 
         // 3. Вычисляем U * x = z
         std::vector<double> x(std::move(z));
-        _mm_prefetch((const char*)x.data(), _MM_HINT_T1);
+        // _mm_prefetch((const char*)x.data(), _MM_HINT_T1);
 
         for (usize i = b.size(); i-- > 0;) {
-            _mm_prefetch((const char*)U[i], _MM_HINT_T1);
+            // _mm_prefetch((const char*)U[i], _MM_HINT_T1);
             for (usize j = i + 1; j < b.size(); j++) {
-                x[i] -= U[i][j] * x[j];
+                x[i] -= LU[i][j] * x[j];
             }
 
-            if (std::abs(U[i][i]) < EPSILON) 
+            if (std::abs(LU[i][i]) < EPSILON) 
                 return std::nullopt;
 
-            x[i] /= U[i][i];
+            x[i] /= LU[i][i];
         }
 
         return x;

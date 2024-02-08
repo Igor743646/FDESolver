@@ -66,4 +66,19 @@ namespace std {
         }
         return out;
     }
+
+    template<class TupType, size_t... I>
+    void _print(std::ostream& out, const TupType& _tup, std::index_sequence<I...>)
+    {
+        out << "Tupple:";
+        (..., (out << "\nIndex " << I << ":\n" << std::get<I>(_tup)));
+    }
+
+    template<class... Args>
+    std::ostream& operator<<(std::ostream& out, const std::tuple<Args...>& _tup)
+    {
+        _print(out, _tup, std::make_index_sequence<sizeof...(Args)>());
+
+        return out;
+    }
 }
