@@ -14,6 +14,11 @@ namespace NEquationSolver {
         TModifiedFDES(const TSolverConfig&);
         TModifiedFDES(TSolverConfig&&);
         virtual TResult Solve();
+
+    private:
+
+        void FillMatrix(NLinalg::TMatrix&);
+        void FillDestination(std::vector<double>&, const TModifiedFDES::TResult&, const usize);
         
     };
 

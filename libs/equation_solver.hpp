@@ -42,10 +42,11 @@ namespace NEquationSolver {
         TSolverConfig Config;
         std::vector<double> GAlpha;
         std::vector<double> GGamma;
+        double PowTCGamma, PowSCAlpha;
 
     private:
 
-        void PrefetchCoefG();
+        void PrefetchCoefficients();
 
     public:
 

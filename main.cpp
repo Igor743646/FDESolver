@@ -1,22 +1,5 @@
 #include <mfdes.hpp>
 
-void Test1() {
-    NLinalg::TMatrix m = NLinalg::TMatrix(3, 3);
-    m[0][0] = 1;
-    m[0][1] = 2;
-    m[0][2] = 3;
-    m[1][0] = 4;
-    m[1][1] = 6;
-    m[1][2] = 6;
-    m[2][0] = -7;
-    m[2][1] = 8;
-    m[2][2] = 9;
-
-    std::cout << "m:\n" << m << std::endl;
-
-    std::cout << "m:\n" << m.Solve({2,-5,8}) << std::endl;
-}
-
 void CalculateTime(auto callback) {
     auto start = std::chrono::system_clock::now();
     callback();
@@ -28,8 +11,7 @@ void CalculateTime(auto callback) {
 }
 
 int main() {
-
-    Test1();
+    NLogger::TLogHelper<>::ChangeLogLevel(2);
 
     NEquationSolver::TSolverConfig config = {
         .LeftBound = 1.0,

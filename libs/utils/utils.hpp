@@ -8,7 +8,6 @@
 #include <unordered_map>
 
 #include <logger/logger.hpp>
-#include <printer/printer.hpp>
 
 #if defined(__GNUC__)
     #define Y_UNLIKELY(exp) __builtin_expect(!!(exp), 0)

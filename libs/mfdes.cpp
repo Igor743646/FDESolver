@@ -2,77 +2,89 @@
 
 namespace NEquationSolver {
 
+    using NLinalg::TMatrix;
+
     TModifiedFDES::TModifiedFDES(const TSolverConfig& config) : IEquationSolver(config) {}
     TModifiedFDES::TModifiedFDES(TSolverConfig&& config) : IEquationSolver(std::move(config)) {}
 
-
-    TModifiedFDES::TResult TModifiedFDES::Solve() {
-        TModifiedFDES::TResult result(Config.TimeCount + 1, Config.SpaceCount + 1, 0.0);
+    void TModifiedFDES::FillMatrix(TMatrix& A) {
         const usize n = Config.SpaceCount;
-        const usize k = Config.TimeCount;
-        const double alpha = Config.Alpha;
-
-        for (usize i = 0; i <= n; i++) {
-            result[0][i] = Config.ZeroTimeState(Space(i));
-        }
-
-        NLinalg::TMatrix A(n + 1);
 
         // create matrix A
         for (usize i = 0; i <= n; i++) {
+            const double space_x = Space(i);
+
             for (usize j = 0; j <= n; j++) {
                 if (i == j) {
-                    A[i][j] = CoefA(Space(i)) * CoefGAlpha(1) + CoefB(Space(i)) * CoefGAlpha(1) - 1.0;
+                    A[i][j] = (CoefA(space_x) + CoefB(space_x)) * CoefGAlpha(1) - 1.0;
                 } else if (i + 1 < j) {
-                    A[i][j] = CoefB(Space(i)) * CoefGAlpha(j - i + 1);
+                    A[i][j] = CoefB(space_x) * CoefGAlpha(j - i + 1);
                 } else if (i > j + 1) {
-                    A[i][j] = CoefA(Space(i)) * CoefGAlpha(i - j + 1);
+                    A[i][j] = CoefA(space_x) * CoefGAlpha(i - j + 1);
                 } else if (i == j + 1) {
-                    A[i][j] = CoefA(Space(i)) * CoefGAlpha(2) + CoefB(Space(i)) - CoefC(Space(i));
+                    A[i][j] = CoefA(space_x) * CoefGAlpha(2) + CoefB(space_x) - CoefC(space_x);
                 } else {
-                    A[i][j] = CoefA(Space(i)) + CoefB(Space(i)) * CoefGAlpha(2) + CoefC(Space(i));
+                    A[i][j] = CoefA(space_x) + CoefB(space_x) * CoefGAlpha(2) + CoefC(space_x);
                 } 
             }
         }
 
         //// 1-border conditions
         if (Config.BordersAvailable) {
-            for (usize i = 0; i <= n; i++) {
-                A[0][i] = 0.0;
-                A[n][i] = 0.0;
-            }
+            std::fill(A[0], A[1], 0.0);
+            std::fill(A[n], &A[n][n + 1], 0.0);
 
             A[0][0] = 1.0;
             A[n][n] = 1.0;
         }
+    }
+
+    void TModifiedFDES::FillDestination(std::vector<double>& d, const TModifiedFDES::TResult& result, const usize t) {
+        const usize n = Config.SpaceCount;
+        const double coef = PowTCGamma;
+        const double time = Time(t);
+
+        for (usize i = 0; i <= n; i++) {
+            d[i] -= result[0][i];
+            d[i] -= coef * Config.SourceFunction(Space(i), time);
+        }
+
+        for (usize j = 1; j <= t; j++) {
+            for (usize i = 0; i <= n; i++) {
+                d[i] += CoefGGamma(j) * (result[t-j][i] - result[0][i]);
+            }
+        }
+
+        //// borders
+        if (Config.BordersAvailable) {
+            d[0] = Config.LeftBoundState(time);
+            d[n] = Config.RightBoundState(time);
+        }
+    }
+
+    TModifiedFDES::TResult TModifiedFDES::Solve() {
+        const usize n = Config.SpaceCount;
+        const usize k = Config.TimeCount;
+
+        TModifiedFDES::TResult result(k + 1, n + 1, 0.0);
+        
+        for (usize i = 0; i <= n; i++) {
+            result[0][i] = Config.ZeroTimeState(Space(i));
+        }
+
+        TMatrix A(n + 1);
+        FillMatrix(A);
 
         auto plu = A.LUFactorizing();
         
         for (usize t = 1; t <= k; t++) {
-            
             // create d-vector
             std::vector<double> d(n + 1, 0.0);
+            FillDestination(d, result, t);
 
-            for (usize i = 0; i <= n; i++) {
-                for (usize j = 1; j <= t; j++) {
-                    d[i] += CoefGGamma(j) * (result[t-j][i] - result[0][i]);
-                }
-                d[i] -= result[0][i];
-                d[i] -= std::pow(Config.TimeStep, Config.Gamma) * Config.SourceFunction(Space(i), Time(t));
-            }
-
-            //// borders
-            if (Config.BordersAvailable) {
-                d[0] = Config.LeftBoundState(Time(t));
-                d[n] = Config.RightBoundState(Time(t));
-            }
-            
             // solve system
-            auto r = NLinalg::TMatrix::Solve(plu, d).value();
-            
-            for (usize i = 0; i < r.size(); i++) {
-                result[t][i] = r[i];
-            }
+            const auto r = TMatrix::Solve(plu, d).value();
+            std::memcpy(result[t], r.data(), r.size() * sizeof(double));
         }
 
         return result;
