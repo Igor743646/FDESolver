@@ -2,6 +2,7 @@
 #include <cassert>
 #include <optional>
 #include <intrin.h>
+#include <config.pb.h>
 
 namespace NLinalg {
 
@@ -268,19 +269,13 @@ namespace NLinalg {
         return out;
     }
 
-    void TMatrix::WriteText(std::ofstream& out) const {
-        out << Rows << " " << Columns << Endl;
-        for (usize i = 0; i < Rows; i++) {
-            for (usize j = 0; j < Columns; j++) {
-                out << Matrix[i * Columns + j] << ' ';
-            }
-
-            out << Endl;
+    PFDESolver::TMatrix TMatrix::ToProto() const {
+        PFDESolver::TMatrix matrix;
+        matrix.set_rows(Rows);
+        matrix.set_columns(Columns);
+        for (usize i = 0; i < Rows * Columns; i++) {
+            matrix.add_data(Matrix[i]);
         }
-    }
-
-    void TMatrix::WriteBinary(std::ofstream& out) const {
-        out << Rows << Columns;
-        out.write(reinterpret_cast<char*>(Matrix), sizeof(double) * Rows * Columns);
+        return matrix;
     }
 }

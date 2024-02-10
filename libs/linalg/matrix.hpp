@@ -3,6 +3,10 @@
 #include <utils/utils.hpp>
 #include <fstream>
 
+namespace PFDESolver {
+    class TMatrix;
+}
+
 namespace NLinalg {
     class TMatrix {
     public:
@@ -41,8 +45,7 @@ namespace NLinalg {
         friend std::vector<double> operator*(const std::vector<double>&, const TMatrix&);
 
         friend std::ostream& operator<<(std::ostream& out, const TMatrix& m);
-        void WriteText(std::ofstream& out) const;
-        void WriteBinary(std::ofstream& out) const;
+        PFDESolver::TMatrix ToProto() const;
 
     private:
 

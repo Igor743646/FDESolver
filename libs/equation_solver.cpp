@@ -1,7 +1,31 @@
 #include <equation_solver.hpp>
 #include <cassert>
+#include <config.pb.h>
 
 namespace NEquationSolver {
+
+    PFDESolver::TSolverConfig TSolverConfig::ToProto() const {
+        PFDESolver::TSolverConfig config;
+
+        config.set_spacecount(SpaceCount);
+        config.set_timecount(TimeCount);
+        config.set_leftbound(LeftBound);
+        config.set_rightbound(RightBound);
+        config.set_maxtime(MaxTime);
+        config.set_alpha(Alpha);
+        config.set_gamma(Gamma);
+        config.set_spacestep(SpaceStep);
+        config.set_timestep(TimeStep);
+        config.set_beta(Beta);
+        config.set_alphaleft(AlphaLeft);
+        config.set_alpharight(AlphaRight);
+        config.set_betaleft(BetaLeft);
+        config.set_betaright(BetaRight);
+        config.set_bordersavailable(BordersAvailable);
+
+        return config;
+    }
+
     IEquationSolver::IEquationSolver(const TSolverConfig& config) : Config(config) {
         Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep);
         Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep);
@@ -98,26 +122,8 @@ namespace NEquationSolver {
         return Config.DemolitionCoefficient(x) * PowTCGamma / 2.0 / Config.SpaceStep;
     }
 
-    PFDESolver::TSolverConfig IEquationSolver::GetProtoConfig() {
-        PFDESolver::TSolverConfig config;
-
-        config.set_spacecount(Config.SpaceCount);
-        config.set_timecount(Config.TimeCount);
-        config.set_leftbound(Config.LeftBound);
-        config.set_rightbound(Config.RightBound);
-        config.set_maxtime(Config.MaxTime);
-        config.set_alpha(Config.Alpha);
-        config.set_gamma(Config.Gamma);
-        config.set_spacestep(Config.SpaceStep);
-        config.set_timestep(Config.TimeStep);
-        config.set_beta(Config.Beta);
-        config.set_alphaleft(Config.AlphaLeft);
-        config.set_alpharight(Config.AlphaRight);
-        config.set_betaleft(Config.BetaLeft);
-        config.set_betaright(Config.BetaRight);
-        config.set_bordersavailable(Config.BordersAvailable);
-
-        return config;
+    const TSolverConfig& IEquationSolver::GetConfig() const {
+        return Config;
     }
 }
 

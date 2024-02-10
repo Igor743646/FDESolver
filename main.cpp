@@ -1,4 +1,5 @@
 #include <mfdes.hpp>
+#include <config.pb.h>
 
 void CalculateTime(auto callback) {
     auto start = std::chrono::system_clock::now();
@@ -39,29 +40,17 @@ int main(int argc, char** argv) {
         result = solver.Solve();
     });
 
-    std::ofstream textFile("result.txt", std::ios_base::out | std::ios_base::trunc);
     std::ofstream binaryFile("result.bin", std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
 
-    if (textFile.is_open() && binaryFile.is_open()) {
-        PFDESolver::TSolverConfig conf = solver.GetProtoConfig();
-        PFDESolver::TMatrix matrix;
-        matrix.set_rows(result.Shape().first);
-        matrix.set_columns(result.Shape().second);
-        for (usize i = 0; i < result.Shape().first; i++) {
-            for (usize j = 0; j < result.Shape().second; j++) {
-                matrix.add_data(result[i][j]);
-            }
-        }
-        
+    if (binaryFile.is_open()) {
+        PFDESolver::TSolverConfig conf(std::move(solver.GetConfig().ToProto()));
+        PFDESolver::TMatrix matrix(std::move(result.ToProto()));
         PFDESolver::TResult res;
         res.mutable_config()->Swap(&conf);  
         res.mutable_matrix()->Swap(&matrix);
 
-        assert(res.SerializeToOstream(&textFile));
         assert(res.SerializeToOstream(&binaryFile));
         binaryFile << res.SerializeAsString();
-        // result.WriteText(textFile);
-        // result.WriteBinary(binaryFile);
     } else {
         ERROR_LOG << "Bad openning" << Endl;
     }

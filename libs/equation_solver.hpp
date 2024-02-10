@@ -10,7 +10,10 @@
 #include <iostream>
 #include <utils/utils.hpp>
 #include <linalg/matrix.hpp>
-#include <config.pb.h>
+
+namespace PFDESolver {
+    class TSolverConfig;
+}
 
 namespace NEquationSolver {
     
@@ -36,6 +39,7 @@ namespace NEquationSolver {
         bool BordersAvailable;           // стоит ли учитывать граничные условия
 
         friend std::ostream& operator<<(std::ostream&, const TSolverConfig&);
+        PFDESolver::TSolverConfig ToProto() const;
     };
 
     class IEquationSolver {
@@ -77,7 +81,7 @@ namespace NEquationSolver {
 
         virtual TResult Solve() = 0;
 
-        PFDESolver::TSolverConfig GetProtoConfig();
+        const TSolverConfig& GetConfig() const;
 
         friend std::ostream& operator<<(std::ostream& out, const IEquationSolver& solver) {
 

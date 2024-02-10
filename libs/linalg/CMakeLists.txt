@@ -5,4 +5,4 @@ add_library(linalg STATIC
     matrix.cpp
 )
 
-target_link_libraries(linalg PUBLIC utils)
+target_link_libraries(linalg PUBLIC utils config-proto)

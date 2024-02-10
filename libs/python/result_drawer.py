@@ -40,9 +40,9 @@ def main(arguments):
         res.ParseFromString(file.read())
 
     matrix = np.array(res.Matrix.Data)
-    print(res.Matrix.Rows, res.Matrix.Columns)
     matrix.resize((res.Matrix.Rows, res.Matrix.Columns))
     draw(matrix)
+
 
 if __name__ == "__main__":
     args = parse_args()
