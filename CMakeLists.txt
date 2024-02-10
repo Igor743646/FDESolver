@@ -8,7 +8,7 @@ include_directories("${PROJECT_SOURCE_DIR}/libs/")
 add_subdirectory("${PROJECT_SOURCE_DIR}/libs/")
 
 add_executable(main main.cpp)
-target_link_libraries(main PUBLIC solvers)
+target_link_libraries(main PUBLIC solvers config-proto result-proto matrix-proto linalg utils)
 file(COPY "C:/vcpkg/packages/protobuf_x64-windows/bin/libprotobuf.dll" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release)
 file(COPY "C:/vcpkg/packages/protobuf_x64-windows/bin/libprotobuf-lite.dll" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release)
 file(COPY "C:/vcpkg/packages/protobuf_x64-windows/debug/bin/libprotobufd.dll" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)

@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 from argparse import ArgumentParser
 import numpy as np
-import config_pb2
+import result_pb2
 
 
 
@@ -34,7 +34,7 @@ def draw(matrix):
 
 
 def main(arguments):
-    res = config_pb2.TResult()
+    res = result_pb2.TResult()
     
     with open(arguments.file, mode="rb") as file:
         res.ParseFromString(file.read())

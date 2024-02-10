@@ -19,14 +19,3 @@ message TSolverConfig {
     double BetaRight = 14;      // коэффициент граничных условий третьего рода для x == R
     bool BordersAvailable = 15; // стоит ли учитывать граничные условия
 }
-
-message TMatrix {
-    uint64 Rows = 1;
-    uint64 Columns = 2;
-    repeated double Data = 3;
-}
-
-message TResult {
-    TSolverConfig Config = 1;
-    TMatrix Matrix = 2;
-}

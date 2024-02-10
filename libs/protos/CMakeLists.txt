@@ -10,6 +10,8 @@ message("Proto files output dir: ${PROTO_OUTPUT_DIR}")
 
 list(APPEND PROTO_FILES
     "${CMAKE_CURRENT_LIST_DIR}/config.proto"
+    "${CMAKE_CURRENT_LIST_DIR}/result.proto"
+    "${CMAKE_CURRENT_LIST_DIR}/matrix.proto"
 )
 
 message("Generate proto files...")

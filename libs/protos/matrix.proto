@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package PFDESolver;
+
+message TMatrix {
+    uint64 Rows = 1;
+    uint64 Columns = 2;
+    repeated double Data = 3;
+}

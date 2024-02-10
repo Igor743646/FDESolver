@@ -3,7 +3,7 @@ project(Utils LANGUAGES CXX)
 
 include_directories("${PROJECT_SOURCE_DIR}/../logger/")
 
-add_library(utils STATIC 
+add_library(utils STATIC OBJECT 
     utils.cpp
 )
 

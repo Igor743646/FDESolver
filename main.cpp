@@ -1,5 +1,7 @@
 #include <mfdes.hpp>
 #include <config.pb.h>
+#include <result.pb.h>
+#include <matrix.pb.h>
 
 void CalculateTime(auto callback) {
     auto start = std::chrono::system_clock::now();

@@ -2,7 +2,7 @@
 #include <cassert>
 #include <optional>
 #include <intrin.h>
-#include <config.pb.h>
+#include <matrix.pb.h>
 
 namespace NLinalg {
 

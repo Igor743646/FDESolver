@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package PFDESolver;
+
+import "config.proto";
+import "matrix.proto";
+
+message TResult {
+    TSolverConfig Config = 1;
+    TMatrix Matrix = 2;
+}
