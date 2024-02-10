@@ -401,3 +401,4 @@ FodyWeavers.xsd
 build/
 .vscode/settings.json
 .vscode/
+result.bin
