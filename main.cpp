@@ -10,7 +10,7 @@ void CalculateTime(auto callback) {
     INFO_LOG << time_ms << Endl;
 }
 
-int main() {
+int main(int argc, char** argv) {
     NLogger::TLogHelper<>::ChangeLogLevel(2);
 
     NEquationSolver::TSolverConfig config = {
@@ -32,7 +32,7 @@ int main() {
     };
 
     NEquationSolver::TModifiedFDES solver(config);
-
+    
     NLinalg::TMatrix result;
 
     CalculateTime([&](){
@@ -43,8 +43,25 @@ int main() {
     std::ofstream binaryFile("result.bin", std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
 
     if (textFile.is_open() && binaryFile.is_open()) {
-        result.WriteText(textFile);
-        result.WriteBinary(binaryFile);
+        PFDESolver::TSolverConfig conf = solver.GetProtoConfig();
+        PFDESolver::TMatrix matrix;
+        matrix.set_rows(result.Shape().first);
+        matrix.set_columns(result.Shape().second);
+        for (usize i = 0; i < result.Shape().first; i++) {
+            for (usize j = 0; j < result.Shape().second; j++) {
+                matrix.add_data(result[i][j]);
+            }
+        }
+        
+        PFDESolver::TResult res;
+        res.mutable_config()->Swap(&conf);  
+        res.mutable_matrix()->Swap(&matrix);
+
+        assert(res.SerializeToOstream(&textFile));
+        assert(res.SerializeToOstream(&binaryFile));
+        binaryFile << res.SerializeAsString();
+        // result.WriteText(textFile);
+        // result.WriteBinary(binaryFile);
     } else {
         ERROR_LOG << "Bad openning" << Endl;
     }

@@ -97,6 +97,28 @@ namespace NEquationSolver {
     double IEquationSolver::CoefC(double x) {
         return Config.DemolitionCoefficient(x) * PowTCGamma / 2.0 / Config.SpaceStep;
     }
+
+    PFDESolver::TSolverConfig IEquationSolver::GetProtoConfig() {
+        PFDESolver::TSolverConfig config;
+
+        config.set_spacecount(Config.SpaceCount);
+        config.set_timecount(Config.TimeCount);
+        config.set_leftbound(Config.LeftBound);
+        config.set_rightbound(Config.RightBound);
+        config.set_maxtime(Config.MaxTime);
+        config.set_alpha(Config.Alpha);
+        config.set_gamma(Config.Gamma);
+        config.set_spacestep(Config.SpaceStep);
+        config.set_timestep(Config.TimeStep);
+        config.set_beta(Config.Beta);
+        config.set_alphaleft(Config.AlphaLeft);
+        config.set_alpharight(Config.AlphaRight);
+        config.set_betaleft(Config.BetaLeft);
+        config.set_betaright(Config.BetaRight);
+        config.set_bordersavailable(Config.BordersAvailable);
+
+        return config;
+    }
 }
 
 std::ostream& NEquationSolver::operator<<(std::ostream& out, const NEquationSolver::TSolverConfig& config) {

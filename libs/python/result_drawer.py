@@ -1,6 +1,8 @@
 from matplotlib import pyplot as plt
 from argparse import ArgumentParser
 import numpy as np
+import config_pb2
+
 
 
 def parse_args():
@@ -32,16 +34,14 @@ def draw(matrix):
 
 
 def main(arguments):
-    values = []
-    n = m = None
-    with open(arguments.file, mode="r") as file:
-        n, m = [int(i) for i in file.readline().strip(" \n").split(' ')]
-        for row in file:
-            s = row.strip(" \n").split(' ')
-            values.extend(list(map(float, s)))
+    res = config_pb2.TResult()
+    
+    with open(arguments.file, mode="rb") as file:
+        res.ParseFromString(file.read())
 
-    matrix = np.array(values)
-    matrix.resize((n, m))
+    matrix = np.array(res.Matrix.Data)
+    print(res.Matrix.Rows, res.Matrix.Columns)
+    matrix.resize((res.Matrix.Rows, res.Matrix.Columns))
     draw(matrix)
 
 if __name__ == "__main__":

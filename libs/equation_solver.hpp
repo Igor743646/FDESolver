@@ -10,6 +10,7 @@
 #include <iostream>
 #include <utils/utils.hpp>
 #include <linalg/matrix.hpp>
+#include <config.pb.h>
 
 namespace NEquationSolver {
     
@@ -43,7 +44,7 @@ namespace NEquationSolver {
         std::vector<double> GAlpha;
         std::vector<double> GGamma;
         double PowTCGamma, PowSCAlpha;
-
+        
     private:
 
         void PrefetchCoefficients();
@@ -75,6 +76,8 @@ namespace NEquationSolver {
         double CoefGGamma(usize);
 
         virtual TResult Solve() = 0;
+
+        PFDESolver::TSolverConfig GetProtoConfig();
 
         friend std::ostream& operator<<(std::ostream& out, const IEquationSolver& solver) {
 

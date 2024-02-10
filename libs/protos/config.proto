@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package PFDESolver;
+
+message TSolverConfig {
+    uint64 SpaceCount = 1;      // количество ячеек по x
+    uint64 TimeCount = 2;       // количество ячеек по t
+    double LeftBound = 3;       // левая граница отрезка сетки по x координате
+    double RightBound = 4;      // правая граница сетки по x координате
+    double MaxTime = 5;         // граница отрезка времени по t координате
+    double Alpha = 6;           // степень производой по x
+    double Gamma = 7;           // степень производной по t
+    double SpaceStep = 8;       // шаг x по сетке
+    double TimeStep = 9;        // шаг t по сетке
+    double Beta = 10;           // коэффициент доли лево/правосторонней производных [-1;+1]
+    double AlphaLeft = 11;      // коэффициент граничных условий третьего рода для x == L
+    double BetaLeft = 12;       // коэффициент граничных условий третьего рода для x == L
+    double AlphaRight = 13;     // коэффициент граничных условий третьего рода для x == R
+    double BetaRight = 14;      // коэффициент граничных условий третьего рода для x == R
+    bool BordersAvailable = 15; // стоит ли учитывать граничные условия
+}
+
+message TMatrix {
+    uint64 Rows = 1;
+    uint64 Columns = 2;
+    repeated double Data = 3;
+}
+
+message TResult {
+    TSolverConfig Config = 1;
+    TMatrix Matrix = 2;
+}
