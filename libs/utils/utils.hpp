@@ -6,6 +6,7 @@
 #include <thread>
 #include <algorithm>
 #include <map>
+#include <numbers>
 #include <unordered_map>
 
 #include <logger/logger.hpp>

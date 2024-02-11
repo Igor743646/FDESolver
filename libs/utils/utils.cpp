@@ -1,6 +1,5 @@
 #include <utils.hpp>
 #include <cmath>
-#include <numbers>
 #include <limits>
 
 namespace NFunctions {

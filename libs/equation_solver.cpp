@@ -1,6 +1,8 @@
 #include <equation_solver.hpp>
 #include <cassert>
 #include <config.pb.h>
+#include <result.pb.h>
+#include <matrix.pb.h>
 
 namespace NEquationSolver {
 
@@ -24,6 +26,56 @@ namespace NEquationSolver {
         config.set_bordersavailable(BordersAvailable);
 
         return config;
+    }
+
+    PFDESolver::TResult IEquationSolver::TResult::ToProto() const {
+        PFDESolver::TResult res;
+        PFDESolver::TSolverConfig conf(std::move(Config.ToProto()));
+        res.mutable_config()->Swap(&conf);
+        PFDESolver::TMatrix field(std::move(Field.ToProto()));
+        res.mutable_field()->Swap(&field);
+
+        if (SolveMatrix.has_value()) {
+            PFDESolver::TMatrix solveMatrix(std::move(SolveMatrix->ToProto()));
+            res.mutable_solvematrix()->Swap(&solveMatrix);
+        }
+
+        if (RealSolution.has_value() && RealSolutionName.has_value()) {
+            PFDESolver::TMatrix realSolution(std::move(RealSolution->ToProto()));
+            res.mutable_realsolution()->Swap(&realSolution);
+            res.set_realsolutionname(*RealSolutionName);
+        }
+        
+        return res;
+    }
+
+    bool IEquationSolver::TResult::SaveToFile(std::string name) const {
+        INFO_LOG << "Save result in file: " << name << Endl;
+        std::ofstream binaryFile(name, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
+
+        if (binaryFile.is_open()) {
+            PFDESolver::TResult res = ToProto();
+            binaryFile << res.SerializeAsString();
+        } else {
+            ERROR_LOG << "Bad openning" << Endl;
+            return false;
+        }
+
+        return true;
+    }
+
+    void IEquationSolver::TResult::AddMetaRealSolution(const std::function<double(double, double)>& func, const std::string& name) {
+        INFO_LOG << "Adding real solution" << Endl;
+        const usize n = Config.SpaceCount;
+        const usize k = Config.TimeCount;
+
+        RealSolutionName = name;
+        RealSolution = NLinalg::TMatrix(k + 1, n + 1);
+        for (usize i = 0; i <= k; i++) {
+            for (usize j = 0; j <= n; j++) {
+                (*RealSolution)[i][j] = func(Config.LeftBound + j * Config.SpaceStep, i * Config.TimeStep);
+            }
+        }
     }
 
     IEquationSolver::IEquationSolver(const TSolverConfig& config) : Config(config) {

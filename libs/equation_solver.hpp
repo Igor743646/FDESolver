@@ -13,6 +13,7 @@
 
 namespace PFDESolver {
     class TSolverConfig;
+    class TResult;
 }
 
 namespace NEquationSolver {
@@ -48,14 +49,24 @@ namespace NEquationSolver {
         std::vector<double> GAlpha;
         std::vector<double> GGamma;
         double PowTCGamma, PowSCAlpha;
-        
+
     private:
 
         void PrefetchCoefficients();
 
     public:
 
-        using TResult = NLinalg::TMatrix;
+        struct TResult {
+            const TSolverConfig& Config;
+            NLinalg::TMatrix Field;
+            std::optional<NLinalg::TMatrix> SolveMatrix;
+            std::optional<NLinalg::TMatrix> RealSolution;
+            std::optional<std::string> RealSolutionName;
+
+            PFDESolver::TResult ToProto() const;
+            bool SaveToFile(std::string name) const;
+            void AddMetaRealSolution(const std::function<double(double, double)>& func, const std::string& name = "");
+        };
 
         IEquationSolver(const TSolverConfig&);
         IEquationSolver(TSolverConfig&&);
@@ -79,7 +90,7 @@ namespace NEquationSolver {
         double CoefGAlpha(usize);
         double CoefGGamma(usize);
 
-        virtual TResult Solve() = 0;
+        virtual TResult Solve(bool saveMeta) = 0;
 
         const TSolverConfig& GetConfig() const;
 

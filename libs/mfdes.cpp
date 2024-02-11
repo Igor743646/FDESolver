@@ -39,7 +39,7 @@ namespace NEquationSolver {
         }
     }
 
-    void TModifiedFDES::FillDestination(std::vector<double>& d, const TModifiedFDES::TResult& result, const usize t) {
+    void TModifiedFDES::FillDestination(std::vector<double>& d, const NLinalg::TMatrix& result, const usize t) {
         const usize n = Config.SpaceCount;
         const double coef = PowTCGamma;
         const double time = Time(t);
@@ -62,11 +62,14 @@ namespace NEquationSolver {
         }
     }
 
-    TModifiedFDES::TResult TModifiedFDES::Solve() {
+    TModifiedFDES::TResult TModifiedFDES::Solve(bool saveMeta) {
+        INFO_LOG << "Start solving..." << Endl;
         const usize n = Config.SpaceCount;
         const usize k = Config.TimeCount;
 
-        TModifiedFDES::TResult result(k + 1, n + 1, 0.0);
+        DEBUG_LOG << "n: " << n << " k: " << k << Endl;
+
+        NLinalg::TMatrix result(k + 1, n + 1, 0.0);
         
         for (usize i = 0; i <= n; i++) {
             result[0][i] = Config.ZeroTimeState(Space(i));
@@ -87,6 +90,14 @@ namespace NEquationSolver {
             std::memcpy(result[t], r.data(), r.size() * sizeof(double));
         }
 
-        return result;
+        TResult res = {
+            .Config = Config, 
+            .Field = result
+        };
+
+        if (saveMeta)
+            res.SolveMatrix = std::move(A);
+
+        return res;
     }
 }

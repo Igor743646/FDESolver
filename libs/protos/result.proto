@@ -7,5 +7,8 @@ import "matrix.proto";
 
 message TResult {
     TSolverConfig Config = 1;
-    TMatrix Matrix = 2;
+    TMatrix Field = 2;
+    optional TMatrix SolveMatrix = 3;
+    optional TMatrix RealSolution = 4;
+    optional string RealSolutionName = 5;
 }

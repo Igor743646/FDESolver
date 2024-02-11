@@ -4,6 +4,9 @@ project(FDESolver LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
+set(CMAKE_CXX_FLAGS_DEBUG_INIT "/W3 /Od")
+set(CMAKE_CXX_FLAGS_RELEASE_INIT "/W3 /O2 /WX")
+
 include_directories("${PROJECT_SOURCE_DIR}/libs/")
 add_subdirectory("${PROJECT_SOURCE_DIR}/libs/")
 
