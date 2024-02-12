@@ -82,7 +82,8 @@ def draw_text_matrix(matrix):
     
 
 def draw(result : Result, arguments : argparse.Namespace):
-    if result.solver_matrix is not None:
+    if result.solver_matrix is not None and \
+    result.solver_matrix.shape[0] * result.solver_matrix.shape[1] < 10000:
         draw_text_matrix(result.solver_matrix)
         plt.savefig(arguments.out + 'SolveMatrixA.jpg', dpi=700, bbox_inches='tight')
     plt.close()

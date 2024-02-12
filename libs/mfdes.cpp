@@ -1,4 +1,5 @@
 #include <mfdes.hpp>
+#include <omp.h>
 
 namespace NEquationSolver {
 
@@ -12,19 +13,22 @@ namespace NEquationSolver {
 
         // create matrix A
         for (usize i = 0; i <= n; i++) {
-            const double space_x = Space(i);
+            const double spaceX = Space(i);
+            const double coefA = CoefA(spaceX);
+            const double coefB = CoefB(spaceX);
+            const double coefC = CoefC(spaceX);
 
             for (usize j = 0; j <= n; j++) {
                 if (i == j) {
-                    A[i][j] = (CoefA(space_x) + CoefB(space_x)) * CoefGAlpha(1) - 1.0;
+                    A[i][j] = (coefA + coefB) * CoefGAlpha(1) - 1.0;
                 } else if (i + 1 < j) {
-                    A[i][j] = CoefB(space_x) * CoefGAlpha(j - i + 1);
+                    A[i][j] = coefB * CoefGAlpha(j - i + 1);
                 } else if (i > j + 1) {
-                    A[i][j] = CoefA(space_x) * CoefGAlpha(i - j + 1);
+                    A[i][j] = coefA * CoefGAlpha(i - j + 1);
                 } else if (i == j + 1) {
-                    A[i][j] = CoefA(space_x) * CoefGAlpha(2) + CoefB(space_x) - CoefC(space_x);
+                    A[i][j] = coefA * CoefGAlpha(2) + coefB - coefC;
                 } else {
-                    A[i][j] = CoefA(space_x) + CoefB(space_x) * CoefGAlpha(2) + CoefC(space_x);
+                    A[i][j] = coefA + coefB * CoefGAlpha(2) + coefC;
                 } 
             }
         }
@@ -92,7 +96,7 @@ namespace NEquationSolver {
 
         TResult res = {
             .Config = Config, 
-            .Field = result
+            .Field = std::move(result),
         };
 
         if (saveMeta)

@@ -204,42 +204,35 @@ namespace NLinalg {
         assert(LU.Shape().first == LU.Shape().second && LU.Shape().second == b.size());
 
         // 1. Вычисляем P^(T)b = bP = y (1 x n)
-        std::vector<double> y(b.size());
-        for (usize i = 0; i < b.size(); i++) {
+        std::vector<double> y(P.size());
+        _mm_prefetch((const char*)y.data(), _MM_HINT_T1);
+
+        for (usize i = 0; i < P.size(); i++) {
             y[i] = b[P[i]];
         }
 
         // 2. Вычисляем L * z = y;
-        std::vector<double> z(std::move(y));
-        // _mm_prefetch((const char*)z.data(), _MM_HINT_T1);
-        
-        for (usize i = 0; i < b.size(); i++) {
-            // _mm_prefetch((const char*)L[i], _MM_HINT_T1);
+        for (usize i = 0; i < P.size(); i++) {
+            _mm_prefetch((const char*)LU[i], _MM_HINT_T1);
             for (usize j = 0; j < i; j++) {
-                z[i] -= LU[i][j] * z[j];
+                y[i] -= LU[i][j] * y[j];
             }
-
-            /* must be L[i][i] == 1 */
-            // z[i] /= L[i][i];
         }
 
         // 3. Вычисляем U * x = z
-        std::vector<double> x(std::move(z));
-        // _mm_prefetch((const char*)x.data(), _MM_HINT_T1);
-
-        for (usize i = b.size(); i-- > 0;) {
-            // _mm_prefetch((const char*)U[i], _MM_HINT_T1);
-            for (usize j = i + 1; j < b.size(); j++) {
-                x[i] -= LU[i][j] * x[j];
+        for (usize i = P.size(); i-- > 0;) {
+            _mm_prefetch((const char*)LU[i], _MM_HINT_T1);
+            for (usize j = i + 1; j < P.size(); j++) {
+                y[i] -= LU[i][j] * y[j];
             }
 
             if (std::abs(LU[i][i]) < EPSILON) 
                 return std::nullopt;
 
-            x[i] /= LU[i][i];
+            y[i] /= LU[i][i];
         }
 
-        return x;
+        return y;
     }
 
     TMatrix TMatrix::E(usize n) {
