@@ -77,18 +77,18 @@ namespace NEquationSolver {
         /// @brief Возвращает x координату
         /// @param  i номер шага по пространственной координате
         /// @return x(i) = LeftBound + i * SpaceStep
-        double Space(usize);
+        double Space(usize) const ;
 
         /// @brief Возвращает t координату
         /// @param  j номер шага по временной координате
         /// @return t(j) = j * TimeStep
-        double Time(usize);
-        double CoefA(double);
-        double CoefB(double);
-        double CoefC(double);
-        double CoefG(double, usize);
-        double CoefGAlpha(usize);
-        double CoefGGamma(usize);
+        double Time(usize) const;
+        double CoefA(double) const;
+        double CoefB(double) const;
+        double CoefC(double) const;
+        double CoefG(double, usize) const;
+        double CoefGAlpha(usize) const;
+        double CoefGGamma(usize) const;
 
         virtual TResult Solve(bool saveMeta) = 0;
 

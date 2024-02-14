@@ -15,6 +15,7 @@
     #define Y_UNLIKELY(exp) __builtin_expect(!!(exp), 0)
 #else
     #define Y_UNLIKELY(exp) (exp)
+    [[noreturn]] __forceinline void __builtin_unreachable() {__assume(false);}
 #endif
 
 using i8  = int8_t;

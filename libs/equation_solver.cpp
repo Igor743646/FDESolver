@@ -79,14 +79,14 @@ namespace NEquationSolver {
     }
 
     IEquationSolver::IEquationSolver(const TSolverConfig& config) : Config(config) {
-        Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep);
-        Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep);
+        Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep) + 1;
+        Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep) + 1;
         PrefetchCoefficients();
     }
 
     IEquationSolver::IEquationSolver(TSolverConfig&& config) : Config(std::move(config)) {
-        Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep);
-        Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep);
+        Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep) + 1;
+        Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep) + 1;
         PrefetchCoefficients();
     }
 
@@ -119,7 +119,7 @@ namespace NEquationSolver {
         
     }
 
-    double IEquationSolver::CoefG(double a, usize i) {
+    double IEquationSolver::CoefG(double a, usize i) const {
         if (a != Config.Alpha && a != Config.Gamma) {
             throw "ERROR: g function using memoization only for \"alpha\" and \"gamma\". If you need more use comments below\n";
 
@@ -140,37 +140,37 @@ namespace NEquationSolver {
         return GGamma[i];
     }
 
-    double IEquationSolver::CoefGAlpha(usize i) {
+    double IEquationSolver::CoefGAlpha(usize i) const {
         assert(i < GAlpha.size());
         return GAlpha[i];
     }
 
-    double IEquationSolver::CoefGGamma(usize j) {
+    double IEquationSolver::CoefGGamma(usize j) const {
         assert(j < GGamma.size());
         return GGamma[j];
     }
 
-    double IEquationSolver::Space(usize i) {
+    double IEquationSolver::Space(usize i) const {
         return Config.LeftBound + static_cast<double>(i) * Config.SpaceStep;
     }
 
-    double IEquationSolver::Time(usize j) {
+    double IEquationSolver::Time(usize j) const {
         return Config.TimeStep * static_cast<double>(j);
     }
 
-    double IEquationSolver::CoefA(double x) {
+    double IEquationSolver::CoefA(double x) const {
         return (1.0 + Config.Beta) 
         * (Config.DiffusionCoefficient(x) / 2.0) 
         * (PowTCGamma / PowSCAlpha);
     }
 
-    double IEquationSolver::CoefB(double x) {
+    double IEquationSolver::CoefB(double x) const {
         return (1.0 - Config.Beta) 
         * (Config.DiffusionCoefficient(x) / 2.0) 
         * (PowTCGamma / PowSCAlpha);
     }
 
-    double IEquationSolver::CoefC(double x) {
+    double IEquationSolver::CoefC(double x) const {
         return Config.DemolitionCoefficient(x) * PowTCGamma / 2.0 / Config.SpaceStep;
     }
 

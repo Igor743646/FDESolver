@@ -9,6 +9,8 @@
     #define LOG_LEVEL 3
 #endif
 
+using namespace NEquationSolver;
+
 auto CalculateTime(auto callback) {
     auto start = std::chrono::system_clock::now();
     auto result = callback();
@@ -25,7 +27,7 @@ int main(int argc, char** argv) {
     NLogger::ChangeLogLevel(LOG_LEVEL);
     
     {   // file:///C:/Users/Igor/Desktop/c++/FDESolver/tasks/task1/task1.md
-        NEquationSolver::TSolverConfig config = {
+        TSolverConfig config = {
             .LeftBound = 1.0,
             .RightBound = 2.0,
             .MaxTime = 1.0,
@@ -43,9 +45,9 @@ int main(int argc, char** argv) {
             .BordersAvailable = true,
         };
 
-        NEquationSolver::TModifiedFDES solver(config);
+        TModifiedFDES<TMFDESRule> solver(config);
 
-        NEquationSolver::IEquationSolver::TResult result = CalculateTime([&](){
+        IEquationSolver::TResult result = CalculateTime([&](){
             return solver.Solve(true);
         });
 
@@ -59,7 +61,7 @@ int main(int argc, char** argv) {
     }
 
     {   // file:///C:/Users/Igor/Desktop/c++/FDESolver/tasks/task2/task2.md
-        NEquationSolver::TSolverConfig config = {
+        TSolverConfig config = {
             .LeftBound = -0.1,
             .RightBound = 0.1,
             .MaxTime = 4.0,
@@ -75,9 +77,9 @@ int main(int argc, char** argv) {
             .BordersAvailable = false,
         };
 
-        NEquationSolver::TModifiedFDES solver(config);
+        TModifiedFDES<TMFDESRule> solver(config);
 
-        NEquationSolver::IEquationSolver::TResult result = CalculateTime([&](){
+        IEquationSolver::TResult result = CalculateTime([&](){
             return solver.Solve(true);
         });
 
