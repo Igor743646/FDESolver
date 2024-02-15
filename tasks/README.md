@@ -64,13 +64,13 @@ $$f'_-(x) = \lim_{h \rightarrow 0}{\frac{f(x)-f(x-h)}{h}} = \lim_{h \rightarrow 
 
 1. <u>Правосторонней</u> производной называется предел:
 
-$$D_{b-}^\alpha f(x) = \lim_{h \rightarrow 0}{\frac{\nabla_{-h}^\alpha(f, x)}{h^\alpha}} = \lim_{h \rightarrow 0}{\frac{1}{h^\alpha}}\sum_{i=0}^{\infty}{ (-1)^{i} \begin{pmatrix}\alpha\\i\end{pmatrix} f(x+ih) } $$
+$$D_{b-}^\alpha f(x) = \lim_{h \rightarrow 0}{\frac{\Delta_{h}^\alpha(f, x)}{h^\alpha}} = \lim_{h \rightarrow 0}{\frac{(-1)^{\lceil \alpha \rceil}}{h^\alpha}}\sum_{i=0}^{\infty}{ (-1)^{i} \begin{pmatrix}\alpha\\i\end{pmatrix} f(x+ih) } $$
 
 2. <u>Левосторонней</u> производной называется предел:
 
 $$D_{a+}^\alpha f(x) = \lim_{h \rightarrow 0}{\frac{\nabla_h^\alpha(f, x)}{h^\alpha}} = \lim_{h \rightarrow 0}{\frac{1}{h^\alpha}}\sum_{i=0}^{\infty}{ (-1)^{i} \begin{pmatrix}\alpha\\i\end{pmatrix} f(x-ih) }$$
 
-$D_{b-}^n f(x) = (-1)^{n}f^n_+(x); n \in Z $
+$D_{b-}^n f(x) = f^n_+(x); n \in Z $
 
 $D_{a+}^n f(x) = f^n_-(x); n \in Z $
 
@@ -105,5 +105,17 @@ $$\lim_{h \rightarrow 0}||E^{-h}|| = \lim_{h \rightarrow 0}\left(\sup_{||f(x)||=
 Можно записать для $\alpha>0$; $h \rightarrow 0$:
 
 $$ \frac{(I-E^{-h})^\alpha f(x)}{h^\alpha} = \frac{1}{h^\alpha} \sum_{i=0}^{\infty}{(-1)^{i}\begin{pmatrix}\alpha\\i\end{pmatrix}f(x-ih)} \approx \frac{d^\alpha}{dx^\alpha}f(x) $$
+
+---
+
+**Интегралы:**
+
+|$f(x)$|$$\int_a^b{\frac{f(s)ds}{(x-s)^\alpha}}$$|
+|-|-|
+|$A$|$$\frac{A}{1-\alpha}\left[ (x-a)^{1-\alpha}-(x-b)^{1-\alpha} \right]$$|
+|$Ax+B$|$$\frac{A}{2-\alpha}\left[ (x-b)^{2-\alpha}-(x-a)^{2-\alpha} \right]+\frac{Ax+B}{1-\alpha} \left[ (x-a)^{1-\alpha}-(x-b)^{1-\alpha} \right]$$|
+|$(Ax+B)^n$|$$\sum_{i=0}^{n}{\sum_{j=0}^{n-i}{  (-1)^j A^{n-i}B^i\begin{pmatrix}n\\i\end{pmatrix}\begin{pmatrix}n-i\\j\end{pmatrix} \frac{x^{n-i-j}}{j+1-i} \left[{(x-a)^{j+1-i}-(x-b)^{j+1-i}}\right]   }}$$|
+
+
 
 ---

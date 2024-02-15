@@ -15,8 +15,11 @@
     #define Y_UNLIKELY(exp) __builtin_expect(!!(exp), 0)
 #else
     #define Y_UNLIKELY(exp) (exp)
-    [[noreturn]] __forceinline void __builtin_unreachable() {__assume(false);}
+    [[noreturn]] __forceinline void __builtin_unreachable() { __assume(false); }
+    [[noreturn]] __forceinline void UNIMPLEMENTED(char const *const s) { throw s; }
 #endif
+
+
 
 using i8  = int8_t;
 using ui8 = uint8_t;

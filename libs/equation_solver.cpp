@@ -79,14 +79,14 @@ namespace NEquationSolver {
     }
 
     IEquationSolver::IEquationSolver(const TSolverConfig& config) : Config(config) {
-        Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep) + 1;
-        Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep) + 1;
+        Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep);
+        Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep);
         PrefetchCoefficients();
     }
 
     IEquationSolver::IEquationSolver(TSolverConfig&& config) : Config(std::move(config)) {
-        Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep) + 1;
-        Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep) + 1;
+        Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep);
+        Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep);
         PrefetchCoefficients();
     }
 

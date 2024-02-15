@@ -54,4 +54,5 @@ namespace NLogger {
 #define INFO_LOG  BASE_LOG(2, "INFO", (__FILENAME__), (__LINE__), "\033[1;93m")
 #define DEBUG_LOG BASE_LOG(3, "DEBUG", (__FILENAME__), (__LINE__), "\033[1;94m")
 #define ERROR_LOG BASE_LOG(1, "ERROR", (__FILENAME__), (__LINE__), "\033[1;91m")
+#define WARNING_LOG BASE_LOG(1, "WARN", (__FILENAME__), (__LINE__), "\033[38;5;207m")
 #define Endl '\n'

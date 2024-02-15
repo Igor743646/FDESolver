@@ -18,7 +18,15 @@ namespace NEquationSolver {
         ~TMFDESRule() = delete;
     };
 
+    struct TRLFDESRule {
+        static double Fill(IEquationSolver const *const solver, usize i, usize j);
+        static double CoefC(IEquationSolver const *const solver, usize k);
+        TRLFDESRule() = delete;
+        ~TRLFDESRule() = delete;
+    };
+
     static_assert(TMatrixFillRuleConcept<TMFDESRule>, "Wrong type TMFDESRule for TMatrixFillRuleConcept");
+    static_assert(TMatrixFillRuleConcept<TRLFDESRule>, "Wrong type TRLFDESRule for TMatrixFillRuleConcept");
 }
 
 namespace NEquationSolver {
@@ -31,8 +39,27 @@ namespace NEquationSolver {
 
     public:
 
-        TModifiedFDES(const TSolverConfig& config) : IEquationSolver(config) {}
-        TModifiedFDES(TSolverConfig&& config) : IEquationSolver(std::move(config)) {}
+        TModifiedFDES(const TSolverConfig& config) : IEquationSolver(config) {
+            Validate();
+        }
+
+        TModifiedFDES(TSolverConfig&& config) : IEquationSolver(std::move(config)) {
+            Validate();
+        }
+
+        void Validate() {
+            double const left = Config.DiffusionCoefficient(0) * PowTCGamma / PowSCAlpha;
+            double const right = Config.Gamma / Config.Alpha;
+            
+            if (left > right) {
+                WARNING_LOG << "May be problem with condition" << Endl
+                            << "\t\tD * pow(tau, gamma) / pow(h, alpha): " << left << Endl
+                            << "\t\tgamma/alpha: " << right << Endl;
+
+                WARNING_LOG << "May make h >= " << std::pow(PowTCGamma * Config.DiffusionCoefficient(0) / right, 1.0/Config.Alpha) << Endl;
+                WARNING_LOG << "Or tau <= " << std::pow(right * PowSCAlpha / Config.DiffusionCoefficient(0), 1.0/Config.Gamma) << Endl;
+            }
+        }
 
         virtual TResult Solve(bool saveMeta) override {
             INFO_LOG << "Start solving..." << Endl;
