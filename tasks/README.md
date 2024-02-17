@@ -40,9 +40,12 @@ $$\boxed{(-1)^iC_m^i = \frac{\Gamma(i-m)}{\Gamma(-m)\Gamma(i+1)}; i,m \in Z}$$
 $\Gamma(1-z)\Gamma(z) = \frac{\pi}{sin(\pi z)} \Rightarrow \Gamma(z) = \frac{\pi}{\Gamma(1-z)sin(\pi z)}$. Тогда:
 
 $$\frac{\Gamma(m+1)}{\Gamma(m-i+1)} = \frac{m}{m-i} \cdot \frac{\Gamma(m)}{\Gamma(m-i)} =$$
-$$ = \frac{m}{m-i} \cdot \frac{\pi}{\Gamma(1-m)sin(\pi m)} \cdot \frac{\Gamma(i-m+1)sin(\pi (m-i))}{\pi} =$$
-$$ = \frac{m}{m-i} \cdot \frac{\Gamma(i-m+1)sin(\pi (m-i))}{\Gamma(1-m)sin(\pi m)} =$$
-$$ = \frac{sin(\pi (m-i))}{sin(\pi m)} \cdot \frac{\Gamma(i-m)}{\Gamma(-m)} = (-1)^i\frac{\Gamma(i-m)}{\Gamma(-m)} \Rightarrow ч.т.д.$$
+
+$$= \frac{m}{m-i} \cdot \frac{\pi}{\Gamma(1-m)sin(\pi m)} \cdot \frac{\Gamma(i-m+1)sin(\pi (m-i))}{\pi} =$$
+
+$$= \frac{m}{m-i} \cdot \frac{\Gamma(i-m+1)sin(\pi (m-i))}{\Gamma(1-m)sin(\pi m)} =$$
+
+$$= \frac{sin(\pi (m-i))}{sin(\pi m)} \cdot \frac{\Gamma(i-m)}{\Gamma(-m)} = (-1)^i\frac{\Gamma(i-m)}{\Gamma(-m)} \Rightarrow ч.т.д.$$
 
 ---
 ---
@@ -51,11 +54,11 @@ $$ = \frac{sin(\pi (m-i))}{sin(\pi m)} \cdot \frac{\Gamma(i-m)}{\Gamma(-m)} = (-
 
 1. <u>Правосторонней</u> производной называется предел:
 
-$$f'_+(x) = \lim_{h \rightarrow 0}{\frac{f(x+h)-f(x)}{h}} = \lim_{h \rightarrow 0}{\frac{\Delta_h^1(f, x)}{h}}$$
+$$\frac{d^+}{dx}f(x) = \lim_{h \rightarrow 0}{\frac{f(x+h)-f(x)}{h}} = \lim_{h \rightarrow 0}{\frac{\Delta_h^1(f, x)}{h}}$$
 
 2. <u>Левосторонней</u> производной называется предел:
 
-$$f'_-(x) = \lim_{h \rightarrow 0}{\frac{f(x)-f(x-h)}{h}} = \lim_{h \rightarrow 0}{\frac{\nabla_h^1(f, x)}{h}}$$
+$$\frac{d^-f(x)}{dx} = \lim_{h \rightarrow 0}{\frac{f(x)-f(x-h)}{h}} = \lim_{h \rightarrow 0}{\frac{\nabla_h^1(f, x)}{h}}$$
 
 ---
 ---
@@ -121,7 +124,7 @@ $$\frac{(I-E^{-h})^\alpha f(x)}{h^\alpha} = \frac{1}{h^\alpha} \sum_{i=0}^{\inft
 |1.|$A$|$$A \cdot K(x, a, b, 1-\alpha)$$|$$\frac{A}{\Gamma(1-\alpha)}(x-a)^{-\alpha}$$|
 |2.|$Ax+B$|$$A \cdot K(x, b, a, 2-\alpha) + (Ax+B) K(x, a, b, 1-\alpha)$$||
 |3.|$Ax^n$|$$A \cdot \sum_{i=0}^{n}{(-1)^i {n \choose i} x^{n-i} K(x, a, b, i+1-\alpha) }$$||
-|4.|$Ax^\beta$|$$Ax^{1+\beta-\alpha} \int_{1-\frac{b}{x}}^{1-\frac{a}{x}}{p^{-\alpha} (1-p)^\beta dp}$$|$$\frac{A}{\Gamma(m-\alpha)} \left[ \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+1)} x^{\beta-\alpha} \Beta_{1-\frac{a}{x}}(m-\alpha, \beta+1) + \sum_{i=1}^{m} {{m \choose i} \left(  \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+i+1)} x^{\beta-\alpha+i}\right) \frac{d^{i-1}}{dx^{i-1}}\left( a^{\beta+1} \frac{(x-a)^{m-\alpha-1}}{x^{m+\beta-\alpha+1}} \right) } \right]$$ <br> При $a=0$ всё упрощается: <br> $$\frac{\Gamma(\beta+1)}{\Gamma(\beta-\alpha+1)} A x^{\beta-\alpha}$$ |
+|4.|$Ax^\beta$|$$Ax^{1+\beta-\alpha} \int_{1-\frac{b}{x}}^{1-\frac{a}{x}}{p^{-\alpha} (1-p)^\beta dp}$$|$$\frac{A}{\Gamma(m-\alpha)} \left[ \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+1)} x^{\beta-\alpha} B_{1-\frac{a}{x}}(m-\alpha, \beta+1) + \sum_{i=1}^{m} {{m \choose i} \left(  \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+i+1)} x^{\beta-\alpha+i}\right) \frac{d^{i-1}}{dx^{i-1}}\left( a^{\beta+1} \frac{(x-a)^{m-\alpha-1}}{x^{m+\beta-\alpha+1}} \right) } \right]$$ <br> При $a=0$ всё упрощается: <br> $$\frac{\Gamma(\beta+1)}{\Gamma(\beta-\alpha+1)} A x^{\beta-\alpha}$$ |
 |5.|$(Ax+B)^n$|$$\sum_{i=0}^{n}{\sum_{j=0}^{n-i}{  (-1)^j A^{n-i}B^i{n \choose i}{n-i \choose j} x^{n-i-j} K(x, a, b, j+1-\alpha)   }}$$||
 
 **Вспомогательные равенства:**
