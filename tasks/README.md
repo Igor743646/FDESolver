@@ -39,9 +39,9 @@ $$\boxed{(-1)^iC_m^i = \frac{\Gamma(i-m)}{\Gamma(-m)\Gamma(i+1)}; i,m \in Z}$$
 Учтём, что:
 $\Gamma(1-z)\Gamma(z) = \frac{\pi}{sin(\pi z)} \Rightarrow \Gamma(z) = \frac{\pi}{\Gamma(1-z)sin(\pi z)}$. Тогда:
 
-$$\frac{\Gamma(m+1)}{\Gamma(m-i+1)} = \frac{m}{m-i} \cdot \frac{\Gamma(m)}{\Gamma(m-i)} = $$
-$$ = \frac{m}{m-i} \cdot \frac{\pi}{\Gamma(1-m)sin(\pi m)} \cdot \frac{\Gamma(i-m+1)sin(\pi (m-i))}{\pi} = $$
-$$ = \frac{m}{m-i} \cdot \frac{\Gamma(i-m+1)sin(\pi (m-i))}{\Gamma(1-m)sin(\pi m)} = $$
+$$\frac{\Gamma(m+1)}{\Gamma(m-i+1)} = \frac{m}{m-i} \cdot \frac{\Gamma(m)}{\Gamma(m-i)} =$$
+$$ = \frac{m}{m-i} \cdot \frac{\pi}{\Gamma(1-m)sin(\pi m)} \cdot \frac{\Gamma(i-m+1)sin(\pi (m-i))}{\pi} =$$
+$$ = \frac{m}{m-i} \cdot \frac{\Gamma(i-m+1)sin(\pi (m-i))}{\Gamma(1-m)sin(\pi m)} =$$
 $$ = \frac{sin(\pi (m-i))}{sin(\pi m)} \cdot \frac{\Gamma(i-m)}{\Gamma(-m)} = (-1)^i\frac{\Gamma(i-m)}{\Gamma(-m)} \Rightarrow ч.т.д.$$
 
 ---
@@ -64,15 +64,15 @@ $$f'_-(x) = \lim_{h \rightarrow 0}{\frac{f(x)-f(x-h)}{h}} = \lim_{h \rightarrow 
 
 1. <u>Правосторонней</u> производной называется предел:
 
-$$D_{b-}^\alpha f(x) = \lim_{h \rightarrow 0}{\frac{\Delta_{h}^\alpha(f, x)}{h^\alpha}} = \lim_{h \rightarrow 0}{\frac{(-1)^{\lceil \alpha \rceil}}{h^\alpha}}\sum_{i=0}^{\infty}{ (-1)^{i} {\alpha \choose i} f(x+ih) } $$
+$$D_{b-}^\alpha f(x) = \lim_{h \rightarrow 0}{\frac{\Delta_{h}^\alpha(f, x)}{h^\alpha}} = \lim_{h \rightarrow 0}{\frac{(-1)^{\lceil \alpha \rceil}}{h^\alpha}}\sum_{i=0}^{\infty}{ (-1)^{i} {\alpha \choose i} f(x+ih) }$$
 
 2. <u>Левосторонней</u> производной называется предел:
 
 $$D_{a+}^\alpha f(x) = \lim_{h \rightarrow 0}{\frac{\nabla_h^\alpha(f, x)}{h^\alpha}} = \lim_{h \rightarrow 0}{\frac{1}{h^\alpha}}\sum_{i=0}^{\infty}{ (-1)^{i} {\alpha \choose i} f(x-ih) }$$
 
-$D_{b-}^n f(x) = f^n_+(x); n \in Z $
+$D_{b-}^n f(x) = f^n_+(x); n \in Z$
 
-$D_{a+}^n f(x) = f^n_-(x); n \in Z $
+$D_{a+}^n f(x) = f^n_-(x); n \in Z$
 
 **Вывод:** Введем оператор $E^t: f(x) \rightarrow f(x+t)$. Обозначим $I=E^0$. Тогда:
 
@@ -104,7 +104,7 @@ $$\lim_{h \rightarrow 0}||E^{-h}|| = \lim_{h \rightarrow 0}\left(\sup_{||f(x)||=
 
 Можно записать для $\alpha>0$; $h \rightarrow 0$:
 
-$$ \frac{(I-E^{-h})^\alpha f(x)}{h^\alpha} = \frac{1}{h^\alpha} \sum_{i=0}^{\infty}{(-1)^{i}{\alpha \choose i}f(x-ih)} \approx \frac{d^\alpha}{dx^\alpha}f(x) $$
+$$\frac{(I-E^{-h})^\alpha f(x)}{h^\alpha} = \frac{1}{h^\alpha} \sum_{i=0}^{\infty}{(-1)^{i}{\alpha \choose i}f(x-ih)} \approx \frac{d^\alpha}{dx^\alpha}f(x)$$
 
 ---
 
@@ -112,78 +112,66 @@ $$ \frac{(I-E^{-h})^\alpha f(x)}{h^\alpha} = \frac{1}{h^\alpha} \sum_{i=0}^{\inf
 
 Сокращения и свойства:
 
-1. $\begin{aligned} K(x, a, b, \alpha) = \frac{1}{\alpha}\left[ (x-a)^{\alpha}-(x-b)^{\alpha} \right]                   \end{aligned}$
-2. $\begin{aligned} \frac{d^m}{dx^m} K(x, a, b, \alpha) = \frac{\Gamma(\alpha)}{\Gamma(\alpha-m)} K(x, a, b, \alpha-m)  \end{aligned}$
+1. $K(x, a, b, \alpha) = \frac{1}{\alpha}\left[ (x-a)^{\alpha}-(x-b)^{\alpha} \right]$
+2. $\frac{d^m}{dx^m} K(x, a, b, \alpha) = \frac{\Gamma(\alpha)}{\Gamma(\alpha-m)} K(x, a, b, \alpha-m)$
 
 Таблица 1 - таблица интегралов и производных
 |№|$f(x)$|$$\int_a^b{\frac{f(s)ds}{(x-s)^\alpha}}$$|$$D^\alpha_{a+,x}f(x)=\frac{1}{\Gamma(m-\alpha)}\frac{d^m}{dx^m}\int_a^x{\frac{f(s)ds}{(x-s)^{1+\alpha-m}}}$$|
 |-|-|-|-|
-|1.|$A$|$\begin{aligned} A \cdot K(x, a, b, 1-\alpha) \end{aligned}$|$\begin{aligned} \frac{A}{\Gamma(1-\alpha)}(x-a)^{-\alpha} \end{aligned}$|
-|2.|$Ax+B$|$\begin{aligned}A \cdot K(x, b, a, 2-\alpha) + (Ax+B) K(x, a, b, 1-\alpha)\end{aligned}$||
-|3.|$Ax^n$|$\begin{aligned} A \cdot \sum_{i=0}^{n}{(-1)^i {n \choose i} x^{n-i} K(x, a, b, i+1-\alpha) } \end{aligned}$||
-|4.|$Ax^\beta$|$\begin{aligned} Ax^{1+\beta-\alpha} \int_{1-\frac{b}{x}}^{1-\frac{a}{x}}{p^{-\alpha} (1-p)^\beta dp} \end{aligned}$ | $\begin{aligned} \frac{A}{\Gamma(m-\alpha)} \left[ \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+1)} x^{\beta-\alpha} \Beta_{1-\frac{a}{x}}(m-\alpha, \beta+1) + \sum_{i=1}^{m} {{m \choose i} \left(  \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+i+1)} x^{\beta-\alpha+i}\right) \frac{d^{i-1}}{dx^{i-1}}\left( a^{\beta+1} \frac{(x-a)^{m-\alpha-1}}{x^{m+\beta-\alpha+1}} \right) } \right] \end{aligned}$ <br> При $a=0$ всё упрощается: <br> $\begin{aligned} \frac{\Gamma(\beta+1)}{\Gamma(\beta-\alpha+1)} A x^{\beta-\alpha} \end{aligned}$ |
-|5.|$(Ax+B)^n$|$\begin{aligned}\sum_{i=0}^{n}{\sum_{j=0}^{n-i}{  (-1)^j A^{n-i}B^i{n \choose i}\begin{pmatrix}n-i\\j\end{pmatrix} x^{n-i-j} K(x, a, b, j+1-\alpha)   }}\end{aligned}$||
+|1.|$A$|$$A \cdot K(x, a, b, 1-\alpha)$$|$$\frac{A}{\Gamma(1-\alpha)}(x-a)^{-\alpha}$$|
+|2.|$Ax+B$|$$A \cdot K(x, b, a, 2-\alpha) + (Ax+B) K(x, a, b, 1-\alpha)$$||
+|3.|$Ax^n$|$$A \cdot \sum_{i=0}^{n}{(-1)^i {n \choose i} x^{n-i} K(x, a, b, i+1-\alpha) }$$||
+|4.|$Ax^\beta$|$$Ax^{1+\beta-\alpha} \int_{1-\frac{b}{x}}^{1-\frac{a}{x}}{p^{-\alpha} (1-p)^\beta dp}$$|$$\frac{A}{\Gamma(m-\alpha)} \left[ \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+1)} x^{\beta-\alpha} \Beta_{1-\frac{a}{x}}(m-\alpha, \beta+1) + \sum_{i=1}^{m} {{m \choose i} \left(  \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+i+1)} x^{\beta-\alpha+i}\right) \frac{d^{i-1}}{dx^{i-1}}\left( a^{\beta+1} \frac{(x-a)^{m-\alpha-1}}{x^{m+\beta-\alpha+1}} \right) } \right]$$ <br> При $a=0$ всё упрощается: <br> $$\frac{\Gamma(\beta+1)}{\Gamma(\beta-\alpha+1)} A x^{\beta-\alpha}$$ |
+|5.|$(Ax+B)^n$|$$\sum_{i=0}^{n}{\sum_{j=0}^{n-i}{  (-1)^j A^{n-i}B^i{n \choose i}{n-i \choose j} x^{n-i-j} K(x, a, b, j+1-\alpha)   }}$$||
 
 **Вспомогательные равенства:**
 
-$(1) 
-\begin{aligned} 
-    \int_a^b{\frac{f(s)ds}{(x-s)^\alpha}} = 
-    \begin{bmatrix}p=x-s\\dp=-ds\\p(b)=x-b\\p(a)=x-a\end{bmatrix} = 
-    \int_{x-b}^{x-a}{\frac{f(x-p)dp}{p^\alpha}} 
-\end{aligned}
-$
+$$(1)
+\int_a^b{\frac{f(s)ds}{(x-s)^\alpha}} = 
+\begin{bmatrix}p=x-s \\\\ dp=-ds \\\\ p(b)=x-b \\\\ p(a)=x-a\end{bmatrix} = 
+\int_{x-b}^{x-a}{\frac{f(x-p)dp}{p^\alpha}} 
+$$
 
-$(2) 
-\begin{aligned} 
-    \int_a^b{\frac{f(s)ds}{(x-s)^\alpha}} = 
-    \begin{bmatrix}p=1-\frac{s}{x}\\s=x-xp\\ds=-xdp\\p(b)=1-\frac{b}{x}\\p(a)=1-\frac{a}{x}\end{bmatrix} = 
-    \int_{1-\frac{b}{x}}^{1-\frac{a}{x}}{\frac{x^{1-\alpha} \cdot f(x-xp)dp}{p^\alpha}} 
-\end{aligned}
-$
+$$(2)
+\int_a^b{\frac{f(s)ds}{(x-s)^\alpha}} = 
+\begin{bmatrix}p=1-\frac{s}{x} \\\\ s=x-xp \\\\ ds=-xdp \\\\ p(b)=1-\frac{b}{x} \\\\ p(a)=1-\frac{a}{x}\end{bmatrix} = 
+\int_{1-\frac{b}{x}}^{1-\frac{a}{x}}{\frac{x^{1-\alpha} \cdot f(x-xp)dp}{p^\alpha}} 
+$$
 
 **Интеграл №1:**
 
-$
-\begin{aligned} 
-    \int_a^b{\frac{Ads}{(x-s)^\alpha}} \overset{(1)}{=}
-    A\int_{x-b}^{x-a}{p^{-\alpha}dp} = 
-    A\left.\frac{p^{1-\alpha}}{1-\alpha} \right\vert_{x-b}^{x-a} = 
-    A\frac{\left[(x-a)^{1-\alpha}-(x-b)^{1-\alpha}\right]}{1-\alpha} = 
-    A \cdot K(x, a, b, 1-\alpha) 
-\end{aligned}
-$
+$$
+\int_a^b{\frac{Ads}{(x-s)^\alpha}} \overset{(1)}{=}
+A\int_{x-b}^{x-a}{p^{-\alpha}dp} = 
+A\left.\frac{p^{1-\alpha}}{1-\alpha} \right\vert_{x-b}^{x-a} = 
+A\frac{\left[(x-a)^{1-\alpha}-(x-b)^{1-\alpha}\right]}{1-\alpha} = 
+A \cdot K(x, a, b, 1-\alpha) 
+$$
 
 **Интеграл №2:**
 
-$
-\begin{aligned} 
-    \int_a^b{\frac{sds}{(x-s)^\alpha}} \overset{(1)}{=} 
-    \int_{x-b}^{x-a}{(x-p)p^{-\alpha}dp} = 
-    \left.\left(x\frac{p^{1-\alpha}}{1-\alpha} - \frac{p^{2-\alpha}}{2-\alpha} \right)\right\vert_{x-b}^{x-a} = 
-    x \cdot K(x, a, b, 1-\alpha) - K(x, a, b, 2-\alpha) = 
-    x \cdot K(x, a, b, 1-\alpha) + K(x, b, a, 2-\alpha) 
-\end{aligned}
-$
+$$
+\int_a^b{\frac{sds}{(x-s)^\alpha}} \overset{(1)}{=} 
+\int_{x-b}^{x-a}{(x-p)p^{-\alpha}dp} = 
+\left.\left(x\frac{p^{1-\alpha}}{1-\alpha} - \frac{p^{2-\alpha}}{2-\alpha} \right)\right\vert_{x-b}^{x-a} = 
+x \cdot K(x, a, b, 1-\alpha) - K(x, a, b, 2-\alpha) = 
+x \cdot K(x, a, b, 1-\alpha) + K(x, b, a, 2-\alpha) 
+$$
 
 **Интеграл №3:**
 
-$
-\begin{aligned} 
-    \int_a^b{\frac{s^\beta ds}{(x-s)^\alpha}} \overset{(2)}{=} 
-    \int_{1-\frac{b}{x}}^{1-\frac{a}{x}}{\frac{x^{1-\alpha} \cdot x^\beta (1-p)^\beta dp}{p^\alpha}} =
-    x^{1+\beta-\alpha} \int_{1-\frac{b}{x}}^{1-\frac{a}{x}}{p^{-\alpha} (1-p)^\beta dp}
-\end{aligned}
-$
+$$
+\int_a^b{\frac{s^\beta ds}{(x-s)^\alpha}} \overset{(2)}{=} 
+\int_{1-\frac{b}{x}}^{1-\frac{a}{x}}{\frac{x^{1-\alpha} \cdot x^\beta (1-p)^\beta dp}{p^\alpha}} =
+x^{1+\beta-\alpha} \int_{1-\frac{b}{x}}^{1-\frac{a}{x}}{p^{-\alpha} (1-p)^\beta dp}
+$$
 
 Пусть $b=x$:
 
-$
-\begin{aligned}
-    \int_{0}^{1-\frac{a}{x}}{p^{-\alpha} (1-p)^\beta dp} = 
-    B_{1-\frac{a}{x}}(1-\alpha, \beta+1) = 
-    B(1-\alpha, \beta+1) \left[ 1-I_{\frac{a}{x}}(\beta+1,1-\alpha) \right]
-\end{aligned}
-$
+$$
+\int_{0}^{1-\frac{a}{x}}{p^{-\alpha} (1-p)^\beta dp} = 
+B_{1-\frac{a}{x}}(1-\alpha, \beta+1) = 
+B(1-\alpha, \beta+1) \left[ 1-I_{\frac{a}{x}}(\beta+1,1-\alpha) \right]
+$$
 
 ---
