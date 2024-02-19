@@ -118,13 +118,19 @@ $$\frac{(I-E^{-h})^\alpha f(x)}{h^\alpha} = \frac{1}{h^\alpha} \sum_{i=0}^{\inft
 1. $K(x, a, b, \alpha) = \frac{1}{\alpha}\left[ (x-a)^{\alpha}-(x-b)^{\alpha} \right]$
 2. $\frac{d^m}{dx^m} K(x, a, b, \alpha) = \frac{\Gamma(\alpha)}{\Gamma(\alpha-m)} K(x, a, b, \alpha-m)$
 
-Таблица 1 - таблица интегралов и производных
-|№|$f(x)$|$$\int_a^b{\frac{f(s)ds}{(x-s)^\alpha}}$$|$$D^\alpha_{a+,x}f(x)=\frac{1}{\Gamma(m-\alpha)}\frac{d^m}{dx^m}\int_a^x{\frac{f(s)ds}{(x-s)^{1+\alpha-m}}}$$|
+Таблица 1 - таблица m-кратного дифференциала
+|$№$|$$f(x)$$|$$\frac{d^m}{dx^m}f(x)$$|
+|-|-|-|
+|1.|$$x^n$$|$$\frac{\Gamma(n+1)}{\Gamma(n-m+1)}x^{n-m}$$|
+|2.|$$f(x)g(x)$$|$$\sum_{i=0}^{m}{ {m \choose i} \frac{d^{m-i}}{dx^{m-i}}f(x) \frac{d^i}{dx^i}g(x) }$$|
+
+Таблица 2 - таблица интегралов и производных
+|$№$|$f(x)$|$$\int_a^b{\frac{f(s)ds}{(x-s)^\alpha}}$$|$$D^\alpha_{a+,x}f(x)=\frac{1}{\Gamma(m-\alpha)}\frac{d^m}{dx^m}\int_a^x{\frac{f(s)ds}{(x-s)^{1+\alpha-m}}}$$|
 |-|-|-|-|
 |1.|$A$|$$A \cdot K(x, a, b, 1-\alpha)$$|$$\frac{A}{\Gamma(1-\alpha)}(x-a)^{-\alpha}$$|
 |2.|$Ax+B$|$$A \cdot K(x, b, a, 2-\alpha) + (Ax+B) K(x, a, b, 1-\alpha)$$||
 |3.|$Ax^n$|$$A \cdot \sum_{i=0}^{n}{(-1)^i {n \choose i} x^{n-i} K(x, a, b, i+1-\alpha) }$$||
-|4.|$Ax^\beta$|$$Ax^{1+\beta-\alpha} \int_{1-\frac{b}{x}}^{1-\frac{a}{x}}{p^{-\alpha} (1-p)^\beta dp}$$|$$\frac{A}{\Gamma(m-\alpha)} \left[ \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+1)} x^{\beta-\alpha} B_{1-\frac{a}{x}}(m-\alpha, \beta+1) + \sum_{i=1}^{m} {{m \choose i} \left(  \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+i+1)} x^{\beta-\alpha+i}\right) \frac{d^{i-1}}{dx^{i-1}}\left( a^{\beta+1} \frac{(x-a)^{m-\alpha-1}}{x^{m+\beta-\alpha+1}} \right) } \right]$$ <br> При $a=0$ всё упрощается: <br> $$\frac{\Gamma(\beta+1)}{\Gamma(\beta-\alpha+1)} A x^{\beta-\alpha}$$ |
+|4.|$Ax^\beta$|$$Ax^{1+\beta-\alpha} \int_{1-\frac{b}{x}}^{1-\frac{a}{x}}{p^{-\alpha} (1-p)^\beta dp}$$ | $$\frac{A}{\Gamma(m-\alpha)} \left[ \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+1)} x^{\beta-\alpha} B_{1-\frac{a}{x}}(m-\alpha, \beta+1) + \sum_{i=1}^{m} {{m \choose i} \left(  \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+i+1)} x^{\beta-\alpha+i}\right) \frac{d^{i-1}}{dx^{i-1}}\left( a^{\beta+1} \frac{(x-a)^{m-\alpha-1}}{x^{m+\beta-\alpha+1}} \right) } \right]$$ <br> При $a=0$ всё упрощается: <br> $$\frac{\Gamma(\beta+1)}{\Gamma(\beta-\alpha+1)} A x^{\beta-\alpha}$$|
 |5.|$(Ax+B)^n$|$$\sum_{i=0}^{n}{\sum_{j=0}^{n-i}{  (-1)^j A^{n-i}B^i{n \choose i}{n-i \choose j} x^{n-i-j} K(x, a, b, j+1-\alpha)   }}$$||
 
 **Вспомогательные равенства:**
