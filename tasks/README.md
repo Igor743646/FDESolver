@@ -219,7 +219,7 @@ $$
 
 Вывод через определение Римана-Лиувилля:
 
-$$\left. \frac{\partial_+^\alpha}{\partial x^\alpha}u(x, t)\right|_{i} = \frac{1}{\Gamma(2-\alpha)}\frac{d^2}{d x^2} \int\limits_{a}^{x}{\frac{u(s, t)}{(x-s)^{\alpha-1}}ds} = \frac{1}{\Gamma(2-\alpha)} \frac{{}_+F_{i+\frac{1}{2}}^k - {}_+F_{i-\frac{1}{2}}^k}{h}$$
+$$\left. \frac{\partial_+^\alpha}{\partial x^\alpha}u(x, t)\right|_ {i} = \frac{1}{\Gamma(2-\alpha)}\frac{d^2}{d x^2} \int\limits_{a}^{x}{\frac{u(s, t)}{(x-s)^{\alpha-1}}ds} = \frac{1}{\Gamma(2-\alpha)} \frac{{}_ +F_{i+\frac{1}{2}}^k - {}_ +F_{i-\frac{1}{2}}^k}{h}$$
 
 $${}_ +F_{i+\frac{1}{2}}^k = \frac{d}{dx_{i+\frac{1}{2}}} \int\limits_{a}^{x_{1+\frac{1}{2}}}{\frac{u(s, t)}{(x_{1+\frac{1}{2}}-s)^{\alpha-1}}ds} = \frac{d}{dx_{i+\frac{1}{2}}} 
 \left[ 
