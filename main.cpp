@@ -61,19 +61,20 @@ int main(int argc, char** argv) {
     NLogger::ChangeLogLevel(LOG_LEVEL);
     
     {   // file:///C:/Users/Igor/Desktop/c++/FDESolver/tasks/task1/task1.md
+        const double alpha = 1.5, gamma = 0.9;
         TSolverConfig config = {
             .LeftBound = 0.0,
             .RightBound = 1.0,
             .MaxTime = 1.0,
-            .Alpha = 1.7,
-            .Gamma = 0.7,
+            .Alpha = alpha,
+            .Gamma = gamma,
             .SpaceStep = 0.1,
-            .TimeStep = 0.001,
+            .TimeStep = 0.01,
             .Beta = 1.0,
-            .DiffusionCoefficient = [](double x){ return NFunctions::Gamma(3.0 - 1.7) / NFunctions::Gamma(3.0) * std::pow(x, 1.7); },
+            .DiffusionCoefficient = [alpha](double x){ return NFunctions::Gamma(3.0 - alpha) / NFunctions::Gamma(3.0) * std::pow(x, alpha); },
             .DemolitionCoefficient = [](double x){ return 0.0; },
             .ZeroTimeState = [](double x){ return 0.0; },
-            .SourceFunction = [](double x, double t){ return NFunctions::Gamma(3.0) / NFunctions::Gamma(3.0 - 0.7) * (std::pow(t, 2.0 - 0.7) * std::pow(x, 2.0)) - std::pow(x, 2.0) * std::pow(t, 2.0); },
+            .SourceFunction = [gamma](double x, double t){ return NFunctions::Gamma(3.0) / NFunctions::Gamma(3.0 - gamma) * (std::pow(t, 2.0 - gamma) * std::pow(x, 2.0)) - std::pow(x, 2.0) * std::pow(t, 2.0); },
             .LeftBoundState = [](double t){ return 0.0; },
             .RightBoundState = [](double t){ return std::pow(t, 2.0); },
             .BordersAvailable = true,
@@ -101,8 +102,8 @@ int main(int argc, char** argv) {
 
     {   // file:///C:/Users/Igor/Desktop/c++/FDESolver/tasks/task2/task2.md
         TSolverConfig config = {
-            .LeftBound = -2.0,
-            .RightBound = 2.0,
+            .LeftBound = -0.4,
+            .RightBound = 0.4,
             .MaxTime = 0.2,
             .Alpha = 1.8,
             .Gamma = 0.9,

@@ -8,6 +8,7 @@
 #include <map>
 #include <numbers>
 #include <unordered_map>
+#include <ranges>
 
 #include <logger/logger.hpp>
 

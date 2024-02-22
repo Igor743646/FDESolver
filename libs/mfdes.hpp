@@ -50,16 +50,21 @@ namespace NEquationSolver {
         }
 
         void Validate() {
-            double const left = Config.DiffusionCoefficient(0) * PowTCGamma / PowSCAlpha;
+            auto range = std::ranges::views::iota(0ull, Config.SpaceCount + 1);
+            usize i = *std::ranges::max_element(range.begin(), range.end(), [&](usize i, usize j){
+                return Config.DiffusionCoefficient(i) < Config.DiffusionCoefficient(j);
+            });
+
+            double const left = Config.DiffusionCoefficient(i) * PowTCGamma / PowSCAlpha;
             double const right = Config.Gamma / Config.Alpha;
-            
+            DEBUG_LOG << "Left: " << left << " (" << i << ") Right: " << right << Endl;
             if (left > right) {
                 WARNING_LOG << "May be problem with condition" << Endl
                             << "\t\tD * pow(tau, gamma) / pow(h, alpha): " << left << Endl
                             << "\t\tgamma/alpha: " << right << Endl;
 
-                WARNING_LOG << "May make h >= " << std::pow(PowTCGamma * Config.DiffusionCoefficient(0) / right, 1.0/Config.Alpha) << Endl;
-                WARNING_LOG << "Or tau <= " << std::pow(right * PowSCAlpha / Config.DiffusionCoefficient(0), 1.0/Config.Gamma) << Endl;
+                WARNING_LOG << "May make h >= " << std::pow(PowTCGamma * Config.DiffusionCoefficient(i) / right, 1.0/Config.Alpha) << Endl;
+                WARNING_LOG << "Or tau <= " << std::pow(right * PowSCAlpha / Config.DiffusionCoefficient(i), 1.0/Config.Gamma) << Endl;
             }
         }
 

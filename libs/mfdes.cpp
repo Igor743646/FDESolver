@@ -30,7 +30,7 @@ namespace NEquationSolver {
 
     double TRLFDESRule::CoefG(IEquationSolver const *const solver, usize k) {
         const double alpha = solver->GetConfig().Alpha;
-        const double C0 = 1.0 / ((2.0 - alpha) * NFunctions::Gamma(2.0 - alpha) * (std::pow(2.0, 2.0 - alpha)));
+        const double C0 = 1.0 / (NFunctions::Gamma(3.0 - alpha) * (std::pow(2.0, 2.0 - alpha)));
         
         if (k == 0) {
             return C0;
@@ -57,11 +57,11 @@ namespace NEquationSolver {
 
         if (i <= j + 1) { // Right
             if (i == j + 1) {
-                result -= solver->CoefB(spaceX) * CoefG(solver, 0);
+                result += solver->CoefB(spaceX) * CoefG(solver, 0);
             } else if (j == n && i < n) {
-                result += solver->CoefB(spaceX) * CoefG(solver, n - j);
+                result -= solver->CoefB(spaceX) * CoefG(solver, n - j);
             } else {
-                result += solver->CoefB(spaceX) * (CoefG(solver, j - i) - CoefG(solver, j - i + 1));
+                result += solver->CoefB(spaceX) * (CoefG(solver, j - i + 1) - CoefG(solver, j - i));
             }
         }
 
