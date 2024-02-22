@@ -23,6 +23,40 @@ auto CalculateTime(auto callback) {
     return result;
 }
 
+template<class T>
+bool SaveResultsToFile(std::string fileName, const T& protobuf) {
+    INFO_LOG << "Save result in file: " << fileName << Endl;
+    std::ofstream binaryFile(fileName, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
+
+    if (binaryFile.is_open()) {
+        binaryFile << protobuf.SerializeAsString();
+    } else {
+        ERROR_LOG << "Bad openning" << Endl;
+        return false;
+    }
+
+    return true;
+}
+
+void SolveTaskAndSave(IEquationSolver& solver, 
+                      PFDESolver::TResults& results, 
+                      bool calculateTime = true, 
+                      bool saveMeta = true,
+                      std::optional<std::function<double(double, double)>> realSolution = std::nullopt,
+                      std::optional<std::string> realSolutionName = std::nullopt) 
+{
+    IEquationSolver::TResult result = calculateTime ? CalculateTime([&solver, saveMeta](){
+        return solver.Solve(saveMeta);
+    }) : solver.Solve(saveMeta);
+
+    if (realSolution.has_value() && realSolutionName.has_value()) {
+        result.AddMetaRealSolution(realSolution.value(), realSolutionName.value());
+    }
+
+    auto pbResult = results.add_results();
+    pbResult->Swap(new PFDESolver::TResult(result.ToProto()));
+}
+
 int main(int argc, char** argv) {
     NLogger::ChangeLogLevel(LOG_LEVEL);
     
@@ -45,62 +79,54 @@ int main(int argc, char** argv) {
             .BordersAvailable = true,
         };
 
-        TModifiedFDES<TMFDESRule> solver(config);
+        TModifiedFDES<TMFDESRule> solver1(config);
+        TModifiedFDES<TRLFDESRule> solver2(config);
+        PFDESolver::TResults results;
+        results.set_allocated_task(new PFDESolver::TSolverConfig(config.ToProto()));
 
-        IEquationSolver::TResult result = CalculateTime([&](){
-            return solver.Solve(true);
-        });
-
-        result.AddMetaRealSolution([](double x, double t){
+        SolveTaskAndSave(solver1, results, true, true, 
+        [](double x, double t){
             return x*x*t*t;
         }, "Real solution: $u(x, t) = x^2 \\cdot t^2$");
 
-        if (!result.SaveToFile("result1.bin")) {
+        SolveTaskAndSave(solver2, results, true, true, 
+        [](double x, double t){
+            return x*x*t*t;
+        }, "Real solution: $u(x, t) = x^2 \\cdot t^2$");
+
+        if (!SaveResultsToFile("result1.bin", results)) {
             ERROR_LOG << "Crushed saving" << Endl;
         }
     }
 
-/* u(x, t) = exp(2t) * x^2 */
-    // FDESbase p1(
-    //     0, 10.0, 0.2, 1.8, 0.9, 0.2, 0.01, 1.0,
-    //     [](double x, double t){ return std::pow(2.0, 0.9) * GAMMA(3.0 - 1.8) / GAMMA(3.0); },                                // D
-    //     [](double x, double t){ return 0.0; },                                 // V
-    //     [](double x){ return std::pow(x, 2.0); },     // psi(x)
-    //     [](double x, double t){ return std::pow(2.0, 0.9) * std::exp(2.0 * t) * (std::pow(x, 2.0) - std::pow(x, 0.2)); },                                  // f(x, t)
-    //     [](double t){ return 0.0; },                                            // phiL(t)
-    //     [](double t){ return std::exp(2.0 * t) * 100.0; }                                             // phiR(t)
-    // );
-
     {   // file:///C:/Users/Igor/Desktop/c++/FDESolver/tasks/task2/task2.md
         TSolverConfig config = {
-            .LeftBound = 0.0,
-            .RightBound = 10.0,
+            .LeftBound = -2.0,
+            .RightBound = 2.0,
             .MaxTime = 0.2,
             .Alpha = 1.8,
             .Gamma = 0.9,
-            .SpaceStep = 0.1,
+            .SpaceStep = 0.02,
             .TimeStep = 0.001,
-            .Beta = 0.0,
-            .DiffusionCoefficient = [](double x){ return std::pow(2.0, 0.9) * std::pow(x, 1.8) * NFunctions::Gamma(3.0 - 1.8) / NFunctions::Gamma(3.0); },
+            .Beta = 0.5,
+            .DiffusionCoefficient = [](double x){ return .1; },
             .DemolitionCoefficient = [](double x){ return 0.0; },
-            .ZeroTimeState = [](double x){ return std::pow(x, 2.0); },
-            .SourceFunction = [](double x, double t){ return (std::pow(2.0, 0.9) - 1.0) * std::exp(2.0 * t) * std::pow(x, 2.0); },
+            .ZeroTimeState = [](double x){ return -0.02 < x && x <= 0.02 ? 50.0 : 0.0; },
+            .SourceFunction = [](double x, double t){ return 0.0; },
             .LeftBoundState = [](double t){ return 0.0; },
-            .RightBoundState = [](double t){ return std::exp(2.0 * t) * 100.0; },
-            .BordersAvailable = true,
+            .RightBoundState = [](double t){ return 0.0; },
+            .BordersAvailable = false,
         };
 
-        TModifiedFDES<TMFDESRule> solver(config);
+        TModifiedFDES<TMFDESRule> solver1(config);
+        TModifiedFDES<TRLFDESRule> solver2(config);
+        PFDESolver::TResults results;
+        results.set_allocated_task(new PFDESolver::TSolverConfig(config.ToProto()));
 
-        IEquationSolver::TResult result = CalculateTime([&](){
-            return solver.Solve(true);
-        });
+        SolveTaskAndSave(solver1, results, true, true);
+        SolveTaskAndSave(solver2, results, true, true);
 
-        result.AddMetaRealSolution([](double x, double t){
-            return x*x*std::exp(2.0 * t);
-        }, "Real solution: $u(x, t) = x^2 \\cdot e^{2t}$");
-
-        if (!result.SaveToFile("result2.bin")) {
+        if (!SaveResultsToFile("result2.bin", results)) {
             ERROR_LOG << "Crushed saving" << Endl;
         }
     }

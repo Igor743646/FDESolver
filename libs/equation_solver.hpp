@@ -57,6 +57,7 @@ namespace NEquationSolver {
     public:
 
         struct TResult {
+            std::string MethodName;
             const TSolverConfig& Config;
             NLinalg::TMatrix Field;
             std::optional<NLinalg::TMatrix> SolveMatrix;

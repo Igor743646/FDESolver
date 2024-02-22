@@ -32,6 +32,7 @@ namespace NEquationSolver {
         PFDESolver::TResult res;
         PFDESolver::TSolverConfig conf(std::move(Config.ToProto()));
         res.mutable_config()->Swap(&conf);
+        res.set_methodname("Solution by finite differences with " + MethodName);
         PFDESolver::TMatrix field(std::move(Field.ToProto()));
         res.mutable_field()->Swap(&field);
 

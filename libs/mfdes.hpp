@@ -13,14 +13,16 @@ namespace NEquationSolver {
     };
 
     struct TMFDESRule {
+        static constexpr std::string Name() { return "Grunwald-Letnikov approximation"; }; 
         static double Fill(IEquationSolver const *const solver, usize i, usize j);
         TMFDESRule() = delete;
         ~TMFDESRule() = delete;
     };
 
     struct TRLFDESRule {
+        static constexpr std::string Name() { return "Riemann-Liouville approximation"; };
         static double Fill(IEquationSolver const *const solver, usize i, usize j);
-        static double CoefC(IEquationSolver const *const solver, usize k);
+        static double CoefG(IEquationSolver const *const solver, usize k);
         TRLFDESRule() = delete;
         ~TRLFDESRule() = delete;
     };
@@ -90,6 +92,7 @@ namespace NEquationSolver {
             }
 
             TResult res = {
+                .MethodName = TFiller::Name(),
                 .Config = Config, 
                 .Field = std::move(result),
             };

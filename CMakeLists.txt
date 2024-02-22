@@ -30,3 +30,7 @@ add_custom_command(TARGET main POST_BUILD
   COMMAND_EXPAND_LISTS
   COMMENT "Copy dll's to binary ($<TARGET_FILE_DIR:main>/$<TARGET_FILE_NAME:main>) list: ($<TARGET_RUNTIME_DLLS:main>)"
 )
+
+# Copy python files
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/libs/python")
+file(COPY "libs/python/result_drawer.py" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/libs/python)

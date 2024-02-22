@@ -6,9 +6,15 @@ import "config.proto";
 import "matrix.proto";
 
 message TResult {
-    TSolverConfig Config = 1;
-    TMatrix Field = 2;
-    optional TMatrix SolveMatrix = 3;
-    optional TMatrix RealSolution = 4;
-    optional string RealSolutionName = 5;
+    string MethodName = 1;
+    TSolverConfig Config = 2;
+    TMatrix Field = 3;
+    optional TMatrix SolveMatrix = 4;
+    optional TMatrix RealSolution = 5;
+    optional string RealSolutionName = 6;
+}
+
+message TResults {
+    TSolverConfig Task = 1;
+    repeated TResult Results = 2;
 }
