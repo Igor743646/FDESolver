@@ -6,23 +6,27 @@
 
 namespace NEquationSolver {
     template<class T>
-    concept TMatrixFillRuleConcept = requires (IEquationSolver const *const solver, usize i, usize j) {
+    concept TMatrixFillRuleConcept = requires (IEquationSolver const *const solver, const NLinalg::TMatrix& result, usize i, usize j) {
         requires !std::is_destructible_v<T>;
         requires !std::is_constructible_v<T>;
-        { T::Fill(solver, i, j) } -> std::convertible_to<double>;
+        { T::FillMatrix(solver, i, j) } -> std::convertible_to<double>;
+        { T::FillDestination(solver, result, i, j) } -> std::convertible_to<double>;
     };
 
     struct TMFDESRule {
         static constexpr std::string Name() { return "Grunwald-Letnikov approximation"; }; 
-        static double Fill(IEquationSolver const *const solver, usize i, usize j);
+        static double FillMatrix(IEquationSolver const *const solver, usize i, usize j);
+        static double FillDestination(IEquationSolver const *const solver, const NLinalg::TMatrix& result, usize i, usize k);
         TMFDESRule() = delete;
         ~TMFDESRule() = delete;
     };
 
     struct TRLFDESRule {
         static constexpr std::string Name() { return "Riemann-Liouville approximation"; };
-        static double Fill(IEquationSolver const *const solver, usize i, usize j);
-        static double CoefG(IEquationSolver const *const solver, usize k);
+        static double FillMatrix(IEquationSolver const *const solver, usize i, usize j);
+        static double FillDestination(IEquationSolver const *const solver, const NLinalg::TMatrix& result, usize i, usize k);
+        static double CoefGMatrix(IEquationSolver const *const solver, usize k);
+        static double CoefGDestination(IEquationSolver const *const solver, usize k);
         TRLFDESRule() = delete;
         ~TRLFDESRule() = delete;
     };
@@ -77,6 +81,7 @@ namespace NEquationSolver {
 
             NLinalg::TMatrix result(k + 1, n + 1, 0.0);
             
+            // # Math: u_i^0=\psi(x_i)
             for (usize i = 0; i <= n; i++) {
                 result[0][i] = Config.ZeroTimeState(Space(i));
             }
@@ -86,6 +91,7 @@ namespace NEquationSolver {
 
             auto plu = A.LUFactorizing();
             
+            // # Math: Au^k=d^k
             for (usize t = 1; t <= k; t++) {
                 // create d-vector
                 std::vector<double> d(n + 1, 0.0);
@@ -116,7 +122,7 @@ namespace NEquationSolver {
             // create matrix A
             for (usize i = 0; i <= n; i++) {
                 for (usize j = 0; j <= n; j++) {
-                    A[i][j] = TFiller::Fill(this, i, j);
+                    A[i][j] = TFiller::FillMatrix(this, i, j);
                 }
             }
 
@@ -130,23 +136,15 @@ namespace NEquationSolver {
             }
         }
 
-        void FillDestination(std::vector<double>& d, const NLinalg::TMatrix& result, const usize t) {
+        void FillDestination(std::vector<double>& d, const NLinalg::TMatrix& result, const usize k) {
             const usize n = Config.SpaceCount;
-            const double coef = PowTCGamma;
-            const double time = Time(t);
+            const double time = Time(k);
 
             for (usize i = 0; i <= n; i++) {
-                d[i] -= result[0][i];
-                d[i] -= coef * Config.SourceFunction(Space(i), time);
+                d[i] = TFiller::FillDestination(this, result, i, k);
             }
 
-            for (usize j = 1; j <= t; j++) {
-                for (usize i = 0; i <= n; i++) {
-                    d[i] += CoefGGamma(j) * (result[t-j][i] - result[0][i]);
-                }
-            }
-
-            //// borders
+            // borders
             if (Config.BordersAvailable) {
                 d[0] = Config.LeftBoundState(time);
                 d[n] = Config.RightBoundState(time);

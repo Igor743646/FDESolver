@@ -48,13 +48,14 @@ namespace NEquationSolver {
         TSolverConfig Config;
         std::vector<double> GAlpha;
         std::vector<double> GGamma;
-        double PowTCGamma, PowSCAlpha;
 
     private:
 
         void PrefetchCoefficients();
 
     public:
+
+        double PowTCGamma, PowSCAlpha;
 
         struct TResult {
             std::string MethodName;
