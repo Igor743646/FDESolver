@@ -16,6 +16,8 @@ add_subdirectory(protos)
 add_library(solvers STATIC OBJECT 
     equation_solver.cpp
     mfdes.cpp
+    sfdes.cpp
+    rules_impl.cpp
 )
 
 target_link_libraries(solvers PUBLIC logger linalg config-proto matrix-proto)

@@ -4,8 +4,8 @@ project(FDESolver LANGUAGES C CXX)
 # C++ flags
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS_DEBUG_INIT "/W3 /Od /fsanitize /fp:precise")
-set(CMAKE_CXX_FLAGS_RELEASE_INIT "/W3 /O2 /WX /fp:precise")
+set(CMAKE_CXX_FLAGS_DEBUG_INIT "/W3 /Od")
+set(CMAKE_CXX_FLAGS_RELEASE_INIT "/W3 /O2 /WX")
 # Protobuf path //TODO for linux
 set(CMAKE_PREFIX_PATH "C:/vcpkg/packages/protobuf_x64-windows/" "${CMAKE_PREFIX_PATH}")
 

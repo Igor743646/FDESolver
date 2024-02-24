@@ -10,6 +10,10 @@
     #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 #endif
 
+namespace {
+    auto LogFileName = "log.log";
+}
+
 namespace NLogger {
 
     unsigned char ChangeLogLevel(unsigned char logLevel);
@@ -22,18 +26,31 @@ namespace NLogger {
         static_assert(LogLevel == 1 || LogLevel == 2 || LogLevel == 3);
 
         TLogHelper(const char* name, const char* file, int line, const char* color) {
+            static bool started = false;
+            if (!started) {
+                std::ofstream file(LogFileName, std::ios_base::out | std::ios_base::trunc);
+                started = true;
+            }
+
             if (LogLevel <= GetUserLogLevel())
-                out << "[ " << color << std::setw(5) << name << "\033[0m ] " << std::setw(30) << file << "(" << line << ")"
-                    << " Thread id: " << std::this_thread::get_id()
-                    << " Message: ";
+                out << std::format("[ {0:>5s} ]{1:>30s}({2}) Thread id: {3} Message: ", 
+                                    name, file, line, std::this_thread::get_id());
         }
 
         TLogHelper& operator=(const TLogHelper&) = delete;
         TLogHelper& operator=(TLogHelper&&) = delete;
         
         ~TLogHelper() {
-            if (LogLevel <= GetUserLogLevel())
-                std::cerr << out.str();
+            if (LogLevel <= GetUserLogLevel()) {
+                std::ofstream file(LogFileName, std::ios_base::out | std::ios_base::app);
+
+                if (file.is_open()) {
+                    file << out.str();
+                    file.close();
+                } else {
+                    std::cerr << out.str();
+                }
+            }
         }
 
         template<class T>

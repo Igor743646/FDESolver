@@ -9,8 +9,8 @@ namespace NEquationSolver {
     PFDESolver::TSolverConfig TSolverConfig::ToProto() const {
         PFDESolver::TSolverConfig config;
 
-        config.set_spacecount(SpaceCount);
-        config.set_timecount(TimeCount);
+        config.set_spacecount(static_cast<usize>((RightBound - LeftBound) / SpaceStep));
+        config.set_timecount(static_cast<usize>(MaxTime / TimeStep));
         config.set_leftbound(LeftBound);
         config.set_rightbound(RightBound);
         config.set_maxtime(MaxTime);
@@ -32,19 +32,13 @@ namespace NEquationSolver {
         PFDESolver::TResult res;
         PFDESolver::TSolverConfig conf(std::move(Config.ToProto()));
         res.mutable_config()->Swap(&conf);
-        res.set_methodname("Solution by finite differences with " + MethodName);
+        res.set_methodname(MethodName);
         PFDESolver::TMatrix field(std::move(Field.ToProto()));
         res.mutable_field()->Swap(&field);
 
         if (SolveMatrix.has_value()) {
             PFDESolver::TMatrix solveMatrix(std::move(SolveMatrix->ToProto()));
             res.mutable_solvematrix()->Swap(&solveMatrix);
-        }
-
-        if (RealSolution.has_value() && RealSolutionName.has_value()) {
-            PFDESolver::TMatrix realSolution(std::move(RealSolution->ToProto()));
-            res.mutable_realsolution()->Swap(&realSolution);
-            res.set_realsolutionname(*RealSolutionName);
         }
         
         return res;
@@ -65,41 +59,31 @@ namespace NEquationSolver {
         return true;
     }
 
-    void IEquationSolver::TResult::AddMetaRealSolution(const std::function<double(double, double)>& func, const std::string& name) {
-        INFO_LOG << "Adding real solution" << Endl;
-        const usize n = Config.SpaceCount;
-        const usize k = Config.TimeCount;
-
-        RealSolutionName = name;
-        RealSolution = NLinalg::TMatrix(k + 1, n + 1);
-        for (usize i = 0; i <= k; i++) {
-            for (usize j = 0; j <= n; j++) {
-                (*RealSolution)[i][j] = func(Config.LeftBound + j * Config.SpaceStep, i * Config.TimeStep);
-            }
-        }
-    }
-
     IEquationSolver::IEquationSolver(const TSolverConfig& config) : Config(config) {
         Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep);
         Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep);
-        PrefetchCoefficients();
+        PrefetchData();
+        Validate();
     }
 
     IEquationSolver::IEquationSolver(TSolverConfig&& config) : Config(std::move(config)) {
         Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep);
         Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep);
-        PrefetchCoefficients();
+        PrefetchData();
+        Validate();
     }
 
     IEquationSolver::IEquationSolver(const IEquationSolver& solver) : Config(solver.Config) {
-        PrefetchCoefficients();
+        PrefetchData();
+        Validate();
     }
 
     IEquationSolver::IEquationSolver(IEquationSolver&& solver) : Config(std::move(solver.Config)) {
-        PrefetchCoefficients();
+        PrefetchData();
+        Validate();
     }
 
-    void IEquationSolver::PrefetchCoefficients() {
+    void IEquationSolver::PrefetchData() {
         GAlpha.resize(Config.SpaceCount + 2);
         GGamma.resize(Config.TimeCount + 2);
         GAlpha[0] = GGamma[0] = 1.0;
@@ -114,6 +98,28 @@ namespace NEquationSolver {
 
         PowTCGamma = std::pow(Config.TimeStep, Config.Gamma);
         PowSCAlpha = std::pow(Config.SpaceStep, Config.Alpha);
+
+        DiffusionCoefficient.resize(Config.SpaceCount+1);
+        DemolitionCoefficient.resize(Config.SpaceCount+1);
+        ZeroTimeState.resize(Config.SpaceCount+1);
+        SourceFunction = NLinalg::TMatrix(Config.TimeCount+1, Config.SpaceCount+1);
+        LeftBoundState.resize(Config.TimeCount+1);
+        RightBoundState.resize(Config.TimeCount+1);
+
+        for (usize i = 0; i <= Config.SpaceCount; i++) {
+            DiffusionCoefficient[i] = Config.DiffusionCoefficient(Space(i));
+            DemolitionCoefficient[i] = Config.DemolitionCoefficient(Space(i));
+            ZeroTimeState[i] = Config.ZeroTimeState(Space(i));
+        }
+
+        for (usize j = 0; j <= Config.TimeCount; j++) {
+            LeftBoundState[j] = Config.LeftBoundState(Time(j));
+            RightBoundState[j] = Config.RightBoundState(Time(j));
+            
+            for (usize i = 0; i <= Config.SpaceCount; i++) {
+                SourceFunction[j][i] = Config.SourceFunction(Space(i), Time(j));
+            }
+        }
     }
 
     IEquationSolver::~IEquationSolver() {
@@ -178,6 +184,51 @@ namespace NEquationSolver {
     const TSolverConfig& IEquationSolver::GetConfig() const {
         return Config;
     }
+
+    void IEquationSolver::Validate() const {
+        DEBUG_LOG << DiffusionCoefficient << Endl;
+        auto diffusionCMaxId = std::ranges::max_element(DiffusionCoefficient.begin(), DiffusionCoefficient.end());
+        double const diffusionCMax = *diffusionCMaxId;
+        auto demolitionCMaxId = std::ranges::max_element(DemolitionCoefficient.begin(), DemolitionCoefficient.end());
+        double const demolitionCMax = *demolitionCMaxId;
+
+        double left = diffusionCMax * PowTCGamma / PowSCAlpha;
+        double right = Config.Gamma / Config.Alpha;
+        INFO_LOG << std::format("Left: {} ({}) Right: {}", left, diffusionCMaxId - DiffusionCoefficient.begin(), right) << Endl;
+        if (left > right) {
+            WARNING_LOG << "May be problem with condition" << Endl
+                        << "\t\tD * pow(tau, gamma) / pow(h, alpha): " << left << Endl
+                        << "\t\tgamma/alpha: " << right << Endl;
+
+            WARNING_LOG << "May make h >= " << std::pow(PowTCGamma * diffusionCMax / right, 1.0/Config.Alpha) << Endl;
+            WARNING_LOG << "Or tau <= " << std::pow(right * PowSCAlpha / diffusionCMax, 1.0/Config.Gamma) << Endl;
+        }
+
+        left = 2.0 * Config.SpaceStep * (CoefA(Space(diffusionCMaxId - DiffusionCoefficient.begin())) * GAlpha[2] + CoefB(Space(diffusionCMaxId - DiffusionCoefficient.begin())));
+        right = demolitionCMax * PowTCGamma;
+        if (left > right) {
+            WARNING_LOG << "May be problem with condition" << Endl
+                        << "\t\t2h * (C+ * g_a_2 + C-): " << left << Endl
+                        << "\t\tpow(tau, gamma)*V: " << right << Endl;
+        }
+
+        left = 2.0 * Config.SpaceStep * (CoefB(Space(diffusionCMaxId - DiffusionCoefficient.begin())) * GAlpha[2] + CoefA(Space(diffusionCMaxId - DiffusionCoefficient.begin())));
+        right = demolitionCMax * PowTCGamma;
+        if (left < right) {
+            WARNING_LOG << "May be problem with condition" << Endl
+                        << "\t\t2h * (C- * g_a_2 + C+): " << left << Endl
+                        << "\t\tpow(tau, gamma)*V: " << right << Endl;
+        }
+    }
+
+    IEquationSolver::TResult IEquationSolver::Solve(bool saveMeta) {
+        try {
+            return DoSolve(saveMeta);
+        } catch(...) {
+            ERROR_LOG << "Something wrong with solving" << Endl;
+            throw "Solve error";
+        }
+    }
 }
 
 std::ostream& NEquationSolver::operator<<(std::ostream& out, const NEquationSolver::TSolverConfig& config) {
@@ -196,4 +247,3 @@ std::ostream& NEquationSolver::operator<<(std::ostream& out, const NEquationSolv
 
     return out;
 }
-

@@ -1,4 +1,5 @@
 #include <mfdes.hpp>
+#include <sfdes.hpp>
 #include <config.pb.h>
 #include <result.pb.h>
 #include <matrix.pb.h>
@@ -41,20 +42,33 @@ bool SaveResultsToFile(std::string fileName, const T& protobuf) {
 void SolveTaskAndSave(IEquationSolver& solver, 
                       PFDESolver::TResults& results, 
                       bool calculateTime = true, 
-                      bool saveMeta = true,
-                      std::optional<std::function<double(double, double)>> realSolution = std::nullopt,
-                      std::optional<std::string> realSolutionName = std::nullopt) 
+                      bool saveMeta = true) 
 {
     IEquationSolver::TResult result = calculateTime ? CalculateTime([&solver, saveMeta](){
         return solver.Solve(saveMeta);
     }) : solver.Solve(saveMeta);
 
-    if (realSolution.has_value() && realSolutionName.has_value()) {
-        result.AddMetaRealSolution(realSolution.value(), realSolutionName.value());
-    }
-
     auto pbResult = results.add_results();
     pbResult->Swap(new PFDESolver::TResult(result.ToProto()));
+
+    const auto& config = solver.GetConfig();
+
+    if (saveMeta && config.RealSolution.has_value()) {
+        INFO_LOG << "Adding real solution" << Endl;
+        const usize n = config.SpaceCount;
+        const usize k = config.TimeCount;
+
+        results.set_realsolutionname(*config.RealSolutionName);
+        auto RealSolution = NLinalg::TMatrix(k + 1, n + 1);
+        for (usize i = 0; i <= k; i++) {
+            for (usize j = 0; j <= n; j++) {
+                RealSolution[i][j] = (*config.RealSolution)(config.LeftBound + j * config.SpaceStep, i * config.TimeStep);
+            }
+        }
+
+        PFDESolver::TMatrix realSolution(std::move(RealSolution.ToProto()));
+        results.mutable_realsolution()->Swap(&realSolution);
+    }
 }
 
 int main(int argc, char** argv) {
@@ -68,7 +82,7 @@ int main(int argc, char** argv) {
             .MaxTime = 1.0,
             .Alpha = alpha,
             .Gamma = gamma,
-            .SpaceStep = 0.1,
+            .SpaceStep = 0.052,
             .TimeStep = 0.01,
             .Beta = 1.0,
             .DiffusionCoefficient = [alpha](double x){ return NFunctions::Gamma(3.0 - alpha) / NFunctions::Gamma(3.0) * std::pow(x, alpha); },
@@ -78,22 +92,21 @@ int main(int argc, char** argv) {
             .LeftBoundState = [](double t){ return 0.0; },
             .RightBoundState = [](double t){ return std::pow(t, 2.0); },
             .BordersAvailable = true,
+            .StochasticIterationCount = 100,
+            .RealSolutionName = "Real solution: $u(x, t) = x^2 \\cdot t^2$",
+            .RealSolution = [](double x, double t){ return x*x*t*t; },
         };
 
-        TModifiedFDES<TMFDESRule> solver1(config);
-        TModifiedFDES<TRLFDESRule> solver2(config);
+        TMatrixFDES<TMFDESRule> solver1(config);
+        TMatrixFDES<TRLFDESRule> solver2(config);
+        TStochasticFDES<TMFDESRule> solver3(config);
+
         PFDESolver::TResults results;
         results.set_allocated_task(new PFDESolver::TSolverConfig(config.ToProto()));
 
-        SolveTaskAndSave(solver1, results, true, true, 
-        [](double x, double t){
-            return x*x*t*t;
-        }, "Real solution: $u(x, t) = x^2 \\cdot t^2$");
-
-        SolveTaskAndSave(solver2, results, true, true, 
-        [](double x, double t){
-            return x*x*t*t;
-        }, "Real solution: $u(x, t) = x^2 \\cdot t^2$");
+        SolveTaskAndSave(solver1, results, true, true);
+        SolveTaskAndSave(solver2, results, true, true);
+        SolveTaskAndSave(solver3, results, true, true);
 
         if (!SaveResultsToFile("result1.bin", results)) {
             ERROR_LOG << "Crushed saving" << Endl;
@@ -112,20 +125,24 @@ int main(int argc, char** argv) {
             .Beta = 0.5,
             .DiffusionCoefficient = [](double x){ return .1; },
             .DemolitionCoefficient = [](double x){ return 0.0; },
-            .ZeroTimeState = [](double x){ return -0.02 < x && x <= 0.02 ? 50.0 : 0.0; },
+            .ZeroTimeState = [](double x){ return -0.01 < x && x < 0.01 ? 50.0 : 0.0; },
             .SourceFunction = [](double x, double t){ return 0.0; },
             .LeftBoundState = [](double t){ return 0.0; },
             .RightBoundState = [](double t){ return 0.0; },
             .BordersAvailable = false,
+            .StochasticIterationCount = 100,
         };
 
-        TModifiedFDES<TMFDESRule> solver1(config);
-        TModifiedFDES<TRLFDESRule> solver2(config);
+        TMatrixFDES<TMFDESRule> solver1(config);
+        TMatrixFDES<TRLFDESRule> solver2(config);
+        TStochasticFDES<TMFDESRule> solver3(config);
+
         PFDESolver::TResults results;
         results.set_allocated_task(new PFDESolver::TSolverConfig(config.ToProto()));
 
         SolveTaskAndSave(solver1, results, true, true);
         SolveTaskAndSave(solver2, results, true, true);
+        SolveTaskAndSave(solver3, results, true, true);
 
         if (!SaveResultsToFile("result2.bin", results)) {
             ERROR_LOG << "Crushed saving" << Endl;

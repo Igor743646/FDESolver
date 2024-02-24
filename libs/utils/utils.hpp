@@ -9,6 +9,7 @@
 #include <numbers>
 #include <unordered_map>
 #include <ranges>
+#include <format>
 
 #include <logger/logger.hpp>
 

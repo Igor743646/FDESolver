@@ -3,7 +3,11 @@ import matplotlib as mpl
 import argparse
 from argparse import ArgumentParser
 import numpy as np
-import result_pb2
+
+try:
+    import result_pb2
+except:
+    from ...build.libs.python import result_pb2
 
 mpl.rcParams["savefig.format"] = "jpg"
 mpl.rcParams["savefig.dpi"] = 'figure'
@@ -16,8 +20,6 @@ class Result(object):
         self.method_name : str = proto_res.MethodName
         self.config = proto_res.Config
         self.solver_matrix : np.ndarray | None = None
-        self.real_solution : np.ndarray | None = None
-        self.real_solution_name : str | None = None 
 
         self.field = np.array(proto_res.Field.Data)
         self.field.resize((proto_res.Field.Rows, proto_res.Field.Columns))
@@ -26,19 +28,23 @@ class Result(object):
             self.solver_matrix = np.array(proto_res.SolveMatrix.Data)
             self.solver_matrix.resize((proto_res.SolveMatrix.Rows, proto_res.SolveMatrix.Columns))
 
-        if proto_res.HasField("RealSolution"):
-            self.real_solution = np.array(proto_res.RealSolution.Data)
-            self.real_solution.resize((proto_res.RealSolution.Rows, proto_res.RealSolution.Columns))
-            self.real_solution_name = proto_res.RealSolutionName
 
 class Results(object):
 
     def __init__(self, results):
         self.results : list[Result] = []
+        self.real_solution : np.ndarray | None = None
+        self.real_solution_name : str | None = None 
 
         self.config = results.Task
         for result in results.Results:
             self.results.append(Result(result))
+
+        if results.HasField("RealSolution"):
+            self.real_solution = np.array(results.RealSolution.Data)
+            self.real_solution.resize((results.RealSolution.Rows, results.RealSolution.Columns))
+            self.real_solution_name = results.RealSolutionName
+
 
 def parse_args() -> argparse.Namespace:
     parser = ArgumentParser()
@@ -55,47 +61,87 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def draw_flat_field(config, field, title = "Heat map of solution by MFDES"):
-    fig, ax = plt.subplots(1, 1, figsize=(10, 7))
-    im = ax.imshow(field, origin="lower", aspect='auto',
+def draw_flat_field(config, results : list[Result]):
+    h, w = 1, len(results)
+
+    fig, ax = plt.subplots(h, w, figsize=(10*w, 7))
+
+    for result_id, result in enumerate(results):
+        im = ax[result_id].imshow(result.field, origin="lower", aspect='auto',
               extent=(config.LeftBound, config.RightBound, 0, config.MaxTime))
-    fig.colorbar(im, ax=ax)
-    ax.set(xlabel='x', ylabel="t")
-    ax.set_title(title)
+        ax[result_id].set(xlabel='x', ylabel="t")
+        ax[result_id].set_title(result.method_name)
+
+        fig.colorbar(im, ax=ax[result_id])
 
 
-def draw_surface(config, solution : tuple[np.ndarray, str], real_solution : tuple[np.ndarray, str] | None = None ):
-    tasks = [solution]
+def draw_surface(config, results : Results):
+    tasks = results.results
 
-    if real_solution is not None and real_solution[0] is not None:
-        tasks.append(real_solution)
+    h, w = 1, len(tasks)
 
-    _, ax = plt.subplots(1, len(tasks), figsize=(10, 7), subplot_kw={"projection": "3d"})
+    if results.real_solution is not None:
+        w += 1
 
-    if len(tasks) == 1:
-        ax = [ax]
+    _, ax = plt.subplots(h, w, figsize=(10*w, 7), subplot_kw={"projection": "3d"})
 
     X = np.linspace(config.LeftBound, config.RightBound, config.SpaceCount + 1)
     Y = np.linspace(0, config.MaxTime, config.TimeCount + 1)
     X, Y = np.meshgrid(X, Y)
 
-    for i, (matrix, title) in enumerate(tasks):
-        ax[i].plot_surface(X, Y, matrix)
-        ax[i].set_title(title)
+    for i, task in enumerate(tasks):
+        ax[i].plot_surface(X, Y, task.field)
+        ax[i].set_title(task.method_name)
         ax[i].set(xlabel='x', ylabel="y", zlabel="u(x, t)")
         ax[i].zaxis.set_rotate_label(False)
 
+    if results.real_solution is not None:
+        ax[-1].plot_surface(X, Y, results.real_solution)
+        ax[-1].set_title(results.real_solution_name)
+        ax[-1].set(xlabel='x', ylabel="y", zlabel="u(x, t)")
+        ax[-1].zaxis.set_rotate_label(False)
 
-def draw_time_slice(config, time_slice, solution : tuple[np.ndarray, str], real_solution : tuple[np.ndarray, str] | None = None):
+
+def draw_error(config, results : Results):
+    tasks = results.results
+
+    h, w = 1, len(tasks)
+
+    fig = plt.figure(figsize=(10*w, 8))
+    figs = fig.subfigures(2, 1)
+
+    ax1 = figs[0].subplots(h, w, subplot_kw={"projection": "3d"})
+    ax2 = figs[1].subplots(h, w)
+
+    X = np.linspace(config.LeftBound, config.RightBound, config.SpaceCount + 1)
+    Y = np.linspace(0, config.MaxTime, config.TimeCount + 1)
+    Xm, Ym = np.meshgrid(X, Y)
+
+    for i, task in enumerate(tasks):
+        error = np.abs(task.field - results.real_solution)
+        ax1[i].plot_surface(Xm, Ym, error)
+        ax1[i].set_title(task.method_name, fontsize=12)
+        ax1[i].set(xlabel='x', ylabel="y", zlabel="u(x, t)")
+        ax1[i].zaxis.set_rotate_label(False)
+        ax2[i].boxplot(error.T, showmeans=True, showfliers=False)
+        ax2[i].set_xticks(ax2[i].get_xticks()[::max(len(Y)//11, 2)], Y[::max(len(Y)//11, 2)])
+        ax2[i].set_title(f"Error increasing")
+
+
+def draw_time_slice(config, time_slice : int, results : Results):
+    tasks = results.results
+
     _, ax = plt.subplots(1, 1, figsize=(10, 7))
 
     X = np.linspace(config.LeftBound, config.RightBound, config.SpaceCount + 1)
-    Y_solution = solution[0][time_slice]
-    ax.plot(X, Y_solution, label=f"{solution[1]}", linewidth=2.0)
 
-    if real_solution is not None and real_solution[0] is not None:
-        Y_real_solution = real_solution[0][time_slice]
-        ax.plot(X, Y_real_solution, label=f"{real_solution[1]}", linewidth=1.5)
+    if results.real_solution is not None:
+        Y_real_solution = results.real_solution[time_slice]
+        ax.plot(X, Y_real_solution, label=f"{results.real_solution_name}", linewidth=1.5)
+
+    for i, task in enumerate(tasks):
+        Y_solution = task.field[time_slice]
+        ax.plot(X, Y_solution, label=f"{task.method_name}", linewidth=2.0)
 
     ax.legend(loc='best')
     ax.grid(True)
@@ -113,38 +159,29 @@ def draw_text_matrix(matrix):
     
 
 def draw(results : Results, arguments : argparse.Namespace):
+    outputs = {
+        "SM" : arguments.out + f'Solve Matrix A',
+        "HM" : arguments.out + f'Solution Heat Map',
+        "SS" : arguments.out + f'Solution Surface',
+        "ER" : arguments.out + f'Error',
+        "TS" : arguments.out + f'Time Slice',
+    }
+
+    draw_flat_field(results.config, results.results)
+    plt.savefig(outputs['HM'])
+
+    draw_surface(results.config, results)
+    plt.savefig(outputs['SS'])
+
+    if arguments.time_slice is not None:
+        draw_time_slice(results.config, 
+                        np.clip(arguments.time_slice, 0, results.config.TimeCount), 
+                        results)
+        plt.savefig(outputs['TS'])
     
-    for result in results.results:
-        outputs = {
-            "SM" : arguments.out + f'Solve Matrix A ({result.method_name})',
-            "HM" : arguments.out + f'Solution Heat Map ({result.method_name})',
-            "SS" : arguments.out + f'Solution Surface ({result.method_name})',
-            "ER" : arguments.out + f'Error ({result.method_name})',
-            "TS" : arguments.out + f'Time Slice ({result.method_name})',
-        }
-        
-        if result.solver_matrix is not None and \
-        result.solver_matrix.shape[0] * result.solver_matrix.shape[1] < 5000:
-            draw_text_matrix(result.solver_matrix)
-            plt.savefig(outputs['SM'])
-        plt.close()
-        
-        draw_flat_field(result.config, result.field, title=f"HeatMap of solution ({result.method_name})")
-        plt.savefig(outputs['HM'])
-
-        draw_surface(result.config, (result.field, result.method_name), (result.real_solution, result.real_solution_name))
-        plt.savefig(outputs['SS'])
-
-        if arguments.time_slice is not None:
-            draw_time_slice(result.config, 
-                            np.clip(arguments.time_slice, 0, result.config.TimeCount), 
-                            (result.field, result.method_name), 
-                            (result.real_solution, result.real_solution_name))
-            plt.savefig(outputs['TS'])
-
-        if result.real_solution is not None:
-            draw_surface(result.config, (np.abs(result.field - result.real_solution), f"Error ({result.method_name})"))
-            plt.savefig(outputs['ER'])
+    if results.real_solution is not None:
+        draw_error(results.config, results)
+        plt.savefig(outputs['ER'])
 
     if arguments.verbose:
         plt.show()

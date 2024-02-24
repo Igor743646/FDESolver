@@ -39,6 +39,11 @@ namespace NEquationSolver {
 
         bool BordersAvailable;           // стоит ли учитывать граничные условия
 
+        usize StochasticIterationCount = 10;    // количество итераций для стохастического алгоритма
+
+        std::optional<std::string> RealSolutionName;                        // latex формула функции c эталонным решением обрамленная $$
+        std::optional<std::function<double(double, double)>> RealSolution;  // функция с эталонным решением
+
         friend std::ostream& operator<<(std::ostream&, const TSolverConfig&);
         PFDESolver::TSolverConfig ToProto() const;
     };
@@ -49,9 +54,18 @@ namespace NEquationSolver {
         std::vector<double> GAlpha;
         std::vector<double> GGamma;
 
+    public:
+        /* From config */
+        std::vector<double> DiffusionCoefficient;
+        std::vector<double> DemolitionCoefficient;
+        std::vector<double> ZeroTimeState;
+        NLinalg::TMatrix SourceFunction;
+        std::vector<double> LeftBoundState;
+        std::vector<double> RightBoundState;
+
     private:
 
-        void PrefetchCoefficients();
+        void PrefetchData();
 
     public:
 
@@ -62,12 +76,9 @@ namespace NEquationSolver {
             const TSolverConfig& Config;
             NLinalg::TMatrix Field;
             std::optional<NLinalg::TMatrix> SolveMatrix;
-            std::optional<NLinalg::TMatrix> RealSolution;
-            std::optional<std::string> RealSolutionName;
 
             PFDESolver::TResult ToProto() const;
             bool SaveToFile(std::string name) const;
-            void AddMetaRealSolution(const std::function<double(double, double)>& func, const std::string& name = "");
         };
 
         IEquationSolver(const TSolverConfig&);
@@ -92,9 +103,12 @@ namespace NEquationSolver {
         double CoefGAlpha(usize) const;
         double CoefGGamma(usize) const;
 
-        virtual TResult Solve(bool saveMeta) = 0;
+        virtual std::string Name() = 0;
+        virtual TResult Solve(bool saveMeta) final;
+        virtual TResult DoSolve(bool saveMeta) = 0;
 
         const TSolverConfig& GetConfig() const;
+        virtual void Validate() const final;
 
         friend std::ostream& operator<<(std::ostream& out, const IEquationSolver& solver) {
 
@@ -106,4 +120,3 @@ namespace NEquationSolver {
         }
     };
 }
-
