@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
             .LeftBoundState = [](double t){ return 0.0; },
             .RightBoundState = [](double t){ return std::pow(t, 2.0); },
             .BordersAvailable = true,
-            .StochasticIterationCount = 100,
+            .StochasticIterationCount = 800,
             .RealSolutionName = "Real solution: $u(x, t) = x^2 \\cdot t^2$",
             .RealSolution = [](double x, double t){ return x*x*t*t; },
         };
