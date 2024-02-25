@@ -3,16 +3,16 @@
 #include <limits>
 
 namespace NFunctions {
-    constexpr double Gamma(double x) {
+    constexpr f64 Gamma(f64 x) {
         return x > 0 
             ? std::tgamma(x) 
-            : -std::numbers::pi_v<double> / (x * std::sin(std::numbers::pi_v<double> * x) * std::tgamma(-x));
+            : -std::numbers::pi_v<f64> / (x * std::sin(std::numbers::pi_v<f64> * x) * std::tgamma(-x));
     }
 
-    double Beta(double x, double y) {
-        double res = Gamma(x) * Gamma(y) / Gamma(x + y);
+    f64 Beta(f64 x, f64 y) {
+        f64 res = Gamma(x) * Gamma(y) / Gamma(x + y);
         if (std::isnan(res)) {
-            res = std::numeric_limits<double>::infinity();
+            res = std::numeric_limits<f64>::infinity();
         }
         return res;
     }

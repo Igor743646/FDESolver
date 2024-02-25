@@ -21,28 +21,28 @@ namespace NEquationSolver {
     struct TSolverConfig {
         usize SpaceCount, TimeCount;    // количество ячеек по x и t координатах соответственно
 
-        double LeftBound, RightBound;   // границы отрезка сетки по x координате
-        double MaxTime;                 // граница отрезка времени по t координате
-        double Alpha, Gamma;            // степени производных по x и t координатах соответственно
-        double SpaceStep, TimeStep;     // шаги по сетки по x и t координатах соответственно
-        double Beta;                    // коэффициент доли лево/правосторонней производных [-1; +1]
+        f64 LeftBound, RightBound;   // границы отрезка сетки по x координате
+        f64 MaxTime;                 // граница отрезка времени по t координате
+        f64 Alpha, Gamma;            // степени производных по x и t координатах соответственно
+        f64 SpaceStep, TimeStep;     // шаги по сетки по x и t координатах соответственно
+        f64 Beta;                    // коэффициент доли лево/правосторонней производных [-1; +1]
 
-        double AlphaLeft, BetaLeft;     // коэффициенты граничных условий третьего рода для x == L
-        double AlphaRight, BetaRight;   // коэффициенты граничных условий третьего рода для x == R
+        f64 AlphaLeft, BetaLeft;     // коэффициенты граничных условий третьего рода для x == L
+        f64 AlphaRight, BetaRight;   // коэффициенты граничных условий третьего рода для x == R
 
-        std::function<double(double)> DiffusionCoefficient;     // коэффициент диффузии при дробной производной по пространству
-        std::function<double(double)> DemolitionCoefficient;    // коэффициент сноса при производной первой степени
-        std::function<double(double)> ZeroTimeState;            // начальное условие при t = 0, u(x, 0) = psi(x)
-        std::function<double(double, double)> SourceFunction;   // функция источник
-        std::function<double(double)> LeftBoundState;           // граничное условие u(L, t) = phiL(t)
-        std::function<double(double)> RightBoundState;          // граничное условие u(R, t) = phiR(t)
+        std::function<f64(f64)> DiffusionCoefficient;     // коэффициент диффузии при дробной производной по пространству
+        std::function<f64(f64)> DemolitionCoefficient;    // коэффициент сноса при производной первой степени
+        std::function<f64(f64)> ZeroTimeState;            // начальное условие при t = 0, u(x, 0) = psi(x)
+        std::function<f64(f64, f64)> SourceFunction;   // функция источник
+        std::function<f64(f64)> LeftBoundState;           // граничное условие u(L, t) = phiL(t)
+        std::function<f64(f64)> RightBoundState;          // граничное условие u(R, t) = phiR(t)
 
         bool BordersAvailable;           // стоит ли учитывать граничные условия
 
         usize StochasticIterationCount = 10;    // количество итераций для стохастического алгоритма
 
         std::optional<std::string> RealSolutionName;                        // latex формула функции c эталонным решением обрамленная $$
-        std::optional<std::function<double(double, double)>> RealSolution;  // функция с эталонным решением
+        std::optional<std::function<f64(f64, f64)>> RealSolution;  // функция с эталонным решением
 
         friend std::ostream& operator<<(std::ostream&, const TSolverConfig&);
         PFDESolver::TSolverConfig ToProto() const;
@@ -51,17 +51,17 @@ namespace NEquationSolver {
     class IEquationSolver {
     protected:
         TSolverConfig Config;
-        std::vector<double> GAlpha;
-        std::vector<double> GGamma;
+        std::vector<f64> GAlpha;
+        std::vector<f64> GGamma;
 
     public:
         /* From config */
-        std::vector<double> DiffusionCoefficient;
-        std::vector<double> DemolitionCoefficient;
-        std::vector<double> ZeroTimeState;
+        std::vector<f64> DiffusionCoefficient;
+        std::vector<f64> DemolitionCoefficient;
+        std::vector<f64> ZeroTimeState;
         NLinalg::TMatrix SourceFunction;
-        std::vector<double> LeftBoundState;
-        std::vector<double> RightBoundState;
+        std::vector<f64> LeftBoundState;
+        std::vector<f64> RightBoundState;
 
     private:
 
@@ -69,7 +69,7 @@ namespace NEquationSolver {
 
     public:
 
-        double PowTCGamma, PowSCAlpha;
+        f64 PowTCGamma, PowSCAlpha;
 
         struct TResult {
             std::string MethodName;
@@ -90,18 +90,18 @@ namespace NEquationSolver {
         /// @brief Возвращает x координату
         /// @param  i номер шага по пространственной координате
         /// @return x(i) = LeftBound + i * SpaceStep
-        double Space(usize) const ;
+        f64 Space(usize) const ;
 
         /// @brief Возвращает t координату
         /// @param  j номер шага по временной координате
         /// @return t(j) = j * TimeStep
-        double Time(usize) const;
-        double CoefA(double) const;
-        double CoefB(double) const;
-        double CoefC(double) const;
-        double CoefG(double, usize) const;
-        double CoefGAlpha(usize) const;
-        double CoefGGamma(usize) const;
+        f64 Time(usize) const;
+        f64 CoefA(f64) const;
+        f64 CoefB(f64) const;
+        f64 CoefC(f64) const;
+        f64 CoefG(f64, usize) const;
+        f64 CoefGAlpha(usize) const;
+        f64 CoefGGamma(usize) const;
 
         virtual std::string Name() = 0;
         virtual TResult Solve(bool saveMeta) final;

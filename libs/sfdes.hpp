@@ -79,28 +79,30 @@ namespace NEquationSolver {
             // Симуляция
             std::random_device device;
             std::mt19937_64 engine(device());
-            std::uniform_real_distribution<double> generator(0.0, 1.0);
+            std::uniform_real_distribution<f64> generator(0.0, 1.0);
 
-            for (usize i = 1; i < n; i++) {
+            for (i64 i = 1; i < n; i++) {
                 #pragma omp parallel for
                 for (i64 j = 1; j <= k; j++) {
                     for (i64 _n = 0; _n < count; _n++) {
-                        long long x = i, y = j;
+                        i64 x = i, y = j;
 
                         while (y > 0 && x < n && x > 0) {
-                            double rnd = generator(engine);
-                            long long idx = 0;
+                            f64 rnd = generator(engine);
+                            i64 idx = 0;
 
                             idx = std::lower_bound(prefsumProbs[x].begin(), prefsumProbs[x].end(), rnd) - prefsumProbs[x].begin();
 
                             result[j][i] += SourceFunction[y][x] * PowTCGamma;
 
                             if (idx <= 2 * n) { // перемещение по пространству
-                                x += idx - n;
+                                x += n - idx;
                                 y--;
                             } else if (idx <= 2 * n + k) { // перемещение по времени
                                 y -= idx - 2 * n + 1;
                             } else {
+                                // x = n;
+                                // y = 1;
                                 break;
                             }
                         }
@@ -116,7 +118,7 @@ namespace NEquationSolver {
                         }
                     }
 
-                    result[j][i] /= static_cast<double>(count);
+                    result[j][i] /= static_cast<f64>(count);
                 }
             }
 
@@ -139,6 +141,7 @@ namespace NEquationSolver {
             Probabilities.resize(n + 1);
 
             for (usize i = 0; i <= n; i++) {
+                // Math: p[0] = p_{-i}, ..., p[n] = p_0, ..., p[2n] = p_{i}, p[2n+1] = q_{2}, ..., p[2n+k] = q_{j+k+1}
                 Probabilities[i].resize(2 * n + 2 + k, 0.0);
 
                 double a00 = CoefA(Space(i)), b00 = CoefB(Space(i)), c00 = CoefC(Space(i));

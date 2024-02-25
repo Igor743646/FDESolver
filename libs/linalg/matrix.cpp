@@ -9,19 +9,19 @@ namespace NLinalg {
     TMatrix::TMatrix() 
     : Rows(0), Columns(0), Matrix(nullptr) {}
 
-    TMatrix::TMatrix(usize rows, usize columns, double fill) 
+    TMatrix::TMatrix(usize rows, usize columns, f64 fill) 
     : Rows(rows), Columns(columns) {
-        Matrix = new double[rows * columns](fill);
+        Matrix = new f64[rows * columns](fill);
     }
 
-    TMatrix::TMatrix(usize rows, usize columns, const std::vector<double>& v)
+    TMatrix::TMatrix(usize rows, usize columns, const std::vector<f64>& v)
     : TMatrix(rows, columns) {
-        std::memcpy(Matrix, v.data(), Rows * Columns * sizeof(double));
+        std::memcpy(Matrix, v.data(), Rows * Columns * sizeof(f64));
     }
     
     TMatrix::TMatrix(const TMatrix& matrix) 
     : TMatrix(matrix.Rows, matrix.Columns) {
-        std::memcpy(Matrix, matrix.Matrix, Rows * Columns * sizeof(double));
+        std::memcpy(Matrix, matrix.Matrix, Rows * Columns * sizeof(f64));
     }
 
     TMatrix::TMatrix(TMatrix&& matrix) 
@@ -34,9 +34,9 @@ namespace NLinalg {
     : TMatrix(rows, rows) {
     }
 
-    TMatrix::TMatrix(const std::vector<double>& v) 
+    TMatrix::TMatrix(const std::vector<f64>& v) 
     : TMatrix(1, v.size()) {
-        std::memcpy(Matrix, v.data(), Rows * Columns * sizeof(double));
+        std::memcpy(Matrix, v.data(), Rows * Columns * sizeof(f64));
     }
 
     TMatrix& TMatrix::operator=(const TMatrix& matrix) {
@@ -47,8 +47,8 @@ namespace NLinalg {
             delete[] Matrix;
         }
 
-        Matrix = new double[Rows * Columns];
-        std::memcpy(Matrix, matrix.Matrix, Rows * Columns * sizeof(double));
+        Matrix = new f64[Rows * Columns];
+        std::memcpy(Matrix, matrix.Matrix, Rows * Columns * sizeof(f64));
 
         return *this;
     }
@@ -68,12 +68,12 @@ namespace NLinalg {
         }
     }
 
-    const double* TMatrix::operator[](usize i) const {
+    const f64* TMatrix::operator[](usize i) const {
         assert(i < Rows);
-        return static_cast<const double*>(Matrix + i * Columns);
+        return static_cast<const f64*>(Matrix + i * Columns);
     }
 
-    double* TMatrix::operator[](usize i) {
+    f64* TMatrix::operator[](usize i) {
         assert(i < Rows);
         return (Matrix + i * Columns);
     }
@@ -94,10 +94,10 @@ namespace NLinalg {
         return result;
     }
 
-    std::vector<double> operator*(const std::vector<double>& lhs, const TMatrix& rhs) {
+    std::vector<f64> operator*(const std::vector<f64>& lhs, const TMatrix& rhs) {
         assert(lhs.size() == rhs.Rows);
 
-        std::vector<double> result(rhs.Columns, 0.0);
+        std::vector<f64> result(rhs.Columns, 0.0);
         for (usize i = 0; i < rhs.Columns; i++) {
             for (usize j = 0; j < lhs.size(); j++) {
                 result[i] += rhs[j][i] * lhs[j];
@@ -170,7 +170,7 @@ namespace NLinalg {
 
             // 3. Алгоритм Гаусса
             for (usize rowId = colId + 1; rowId < Rows; rowId++) {
-                double koef = U[rowId][colId] / U[colId][colId];
+                f64 koef = U[rowId][colId] / U[colId][colId];
 
                 U[rowId][colId] = 0;
                 L[rowId][colId] = koef;
@@ -182,13 +182,13 @@ namespace NLinalg {
         }
 
         for (usize rowId = 0; rowId < Rows; rowId++) {
-            std::memcpy(&L[rowId][rowId], &U[rowId][rowId], (Columns - rowId) * sizeof(double));
+            std::memcpy(&L[rowId][rowId], &U[rowId][rowId], (Columns - rowId) * sizeof(f64));
         }
 
         return std::make_tuple(std::move(P), std::move(L));
     }
 
-    std::optional<std::vector<double>> TMatrix::Solve(const std::vector<double>& b) {
+    std::optional<std::vector<f64>> TMatrix::Solve(const std::vector<f64>& b) {
         assert(Rows == Columns && Columns == b.size());
 
         // 1. Делаем LU - разложение
@@ -197,14 +197,14 @@ namespace NLinalg {
         return TMatrix::Solve(plu, b);
     }
 
-    std::optional<std::vector<double>> TMatrix::Solve(const TPluResult& plu, const std::vector<double>& b) {
+    std::optional<std::vector<f64>> TMatrix::Solve(const TPluResult& plu, const std::vector<f64>& b) {
         auto& [P, LU] = plu;
 
         assert(P.size() == b.size());
         assert(LU.Shape().first == LU.Shape().second && LU.Shape().second == b.size());
 
         // 1. Вычисляем P^(T)b = bP = y (1 x n)
-        std::vector<double> y(P.size());
+        std::vector<f64> y(P.size());
         _mm_prefetch((const char*)y.data(), _MM_HINT_T1);
 
         for (usize i = 0; i < P.size(); i++) {

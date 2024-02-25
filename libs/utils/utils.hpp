@@ -13,6 +13,7 @@
 #include <random>
 #include <cassert>
 #include <format>
+#include <stdfloat>
 
 #include <logger/logger.hpp>
 
@@ -24,8 +25,6 @@
     [[noreturn]] __forceinline void UNIMPLEMENTED(char const *const s) { throw s; }
 #endif
 
-
-
 using i8  = int8_t;
 using ui8 = uint8_t;
 using i16  = int16_t;
@@ -35,12 +34,17 @@ using ui32 = uint32_t;
 using i64  = int64_t;
 using ui64 = uint64_t;
 using usize = size_t;
+using f32 = float;
+using f64 = long double;
 
-constexpr double EPSILON = 0.0000001;
+static_assert(sizeof(f32) == 4, "sizeof(f32) != 4");
+static_assert(sizeof(f64) == 8, "sizeof(f64) != 8");
+
+constexpr f64 EPSILON = 0.0000001;
 
 namespace NFunctions {
-    constexpr double Gamma(double);
-    double Beta(double, double);
+    constexpr f64 Gamma(f64);
+    f64 Beta(f64, f64);
 }
 
 namespace std {

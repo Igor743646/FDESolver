@@ -35,7 +35,7 @@ namespace NEquationSolver {
             // for (usize i = 0; i <= n; i++) {
             //     result[0][i] = ZeroTimeState[i];
             // }
-            std::memcpy(result[0], ZeroTimeState.data(), (n + 1) * sizeof(double));
+            std::memcpy(result[0], ZeroTimeState.data(), (n + 1) * sizeof(f64));
 
             TMatrix A(n + 1);
             FillMatrix(A);
@@ -43,14 +43,14 @@ namespace NEquationSolver {
             auto plu = A.LUFactorizing();
             
             // Math: Au^k=d^k
-            std::vector<double> d(n + 1, 0.0);
+            std::vector<f64> d(n + 1, 0.0);
             for (usize t = 1; t <= k; t++) {
                 // create d-vector
                 FillDestination(d, result, t);
                 
                 // solve system
                 const auto r = TMatrix::Solve(plu, d).value();
-                std::memcpy(result[t], r.data(), r.size() * sizeof(double));
+                std::memcpy(result[t], r.data(), r.size() * sizeof(f64));
             }
 
             TResult res = {
@@ -85,7 +85,7 @@ namespace NEquationSolver {
             }
         }
 
-        void FillDestination(std::vector<double>& d, const NLinalg::TMatrix& result, const usize k) {
+        void FillDestination(std::vector<f64>& d, const NLinalg::TMatrix& result, const usize k) {
             const usize n = Config.SpaceCount;
             
             for (usize i = 0; i <= n; i++) {

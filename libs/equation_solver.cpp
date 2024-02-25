@@ -89,11 +89,11 @@ namespace NEquationSolver {
         GAlpha[0] = GGamma[0] = 1.0;
 
         for (usize i = 1; i < Config.SpaceCount + 2; i++) {
-            GAlpha[i] = (static_cast<double>(i) - 1.0 - Config.Alpha) / static_cast<double>(i) * GAlpha[i - 1];
+            GAlpha[i] = (static_cast<f64>(i) - 1.0 - Config.Alpha) / static_cast<f64>(i) * GAlpha[i - 1];
         }
 
         for (usize i = 1; i < Config.TimeCount + 2; i++) {
-            GGamma[i] = (static_cast<double>(i) - 1.0 - Config.Gamma) / static_cast<double>(i) * GGamma[i - 1];
+            GGamma[i] = (static_cast<f64>(i) - 1.0 - Config.Gamma) / static_cast<f64>(i) * GGamma[i - 1];
         }
 
         PowTCGamma = std::pow(Config.TimeStep, Config.Gamma);
@@ -126,7 +126,7 @@ namespace NEquationSolver {
         
     }
 
-    double IEquationSolver::CoefG(double a, usize i) const {
+    f64 IEquationSolver::CoefG(f64 a, usize i) const {
         if (a != Config.Alpha && a != Config.Gamma) {
             throw "ERROR: g function using memoization only for \"alpha\" and \"gamma\". If you need more use comments below\n";
 
@@ -134,7 +134,7 @@ namespace NEquationSolver {
                 if (std::abs(a) - (ull)std::abs(a) < 0.000001 && i >= a + 1) {
                     return 0.0;
                 }
-                return (i % 2 == 0 ? 1 : -1) / (a + 1) / BETA((double)i + 1.0, a - (double)i + 1.0);
+                return (i % 2 == 0 ? 1 : -1) / (a + 1) / BETA((f64)i + 1.0, a - (f64)i + 1.0);
             */
         }
 
@@ -147,37 +147,37 @@ namespace NEquationSolver {
         return GGamma[i];
     }
 
-    double IEquationSolver::CoefGAlpha(usize i) const {
+    f64 IEquationSolver::CoefGAlpha(usize i) const {
         assert(i < GAlpha.size());
         return GAlpha[i];
     }
 
-    double IEquationSolver::CoefGGamma(usize j) const {
+    f64 IEquationSolver::CoefGGamma(usize j) const {
         assert(j < GGamma.size());
         return GGamma[j];
     }
 
-    double IEquationSolver::Space(usize i) const {
-        return Config.LeftBound + static_cast<double>(i) * Config.SpaceStep;
+    f64 IEquationSolver::Space(usize i) const {
+        return Config.LeftBound + static_cast<f64>(i) * Config.SpaceStep;
     }
 
-    double IEquationSolver::Time(usize j) const {
-        return Config.TimeStep * static_cast<double>(j);
+    f64 IEquationSolver::Time(usize j) const {
+        return Config.TimeStep * static_cast<f64>(j);
     }
 
-    double IEquationSolver::CoefA(double x) const {
+    f64 IEquationSolver::CoefA(f64 x) const {
         return (1.0 + Config.Beta) 
         * (Config.DiffusionCoefficient(x) / 2.0) 
         * (PowTCGamma / PowSCAlpha);
     }
 
-    double IEquationSolver::CoefB(double x) const {
+    f64 IEquationSolver::CoefB(f64 x) const {
         return (1.0 - Config.Beta) 
         * (Config.DiffusionCoefficient(x) / 2.0) 
         * (PowTCGamma / PowSCAlpha);
     }
 
-    double IEquationSolver::CoefC(double x) const {
+    f64 IEquationSolver::CoefC(f64 x) const {
         return Config.DemolitionCoefficient(x) * PowTCGamma / 2.0 / Config.SpaceStep;
     }
 
@@ -188,12 +188,12 @@ namespace NEquationSolver {
     void IEquationSolver::Validate() const {
         DEBUG_LOG << DiffusionCoefficient << Endl;
         auto diffusionCMaxId = std::ranges::max_element(DiffusionCoefficient.begin(), DiffusionCoefficient.end());
-        double const diffusionCMax = *diffusionCMaxId;
+        f64 const diffusionCMax = *diffusionCMaxId;
         auto demolitionCMaxId = std::ranges::max_element(DemolitionCoefficient.begin(), DemolitionCoefficient.end());
-        double const demolitionCMax = *demolitionCMaxId;
+        f64 const demolitionCMax = *demolitionCMaxId;
 
-        double left = diffusionCMax * PowTCGamma / PowSCAlpha;
-        double right = Config.Gamma / Config.Alpha;
+        f64 left = diffusionCMax * PowTCGamma / PowSCAlpha;
+        f64 right = Config.Gamma / Config.Alpha;
         INFO_LOG << std::format("Left: {} ({}) Right: {}", left, diffusionCMaxId - DiffusionCoefficient.begin(), right) << Endl;
         if (left > right) {
             WARNING_LOG << "May be problem with condition" << Endl

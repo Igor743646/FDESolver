@@ -17,7 +17,7 @@ auto CalculateTime(auto callback) {
     auto result = callback();
     auto stop = std::chrono::system_clock::now();
 
-    double time_ms = std::chrono::duration<double, std::milli>(stop - start).count();
+    f64 time_ms = std::chrono::duration<f64, std::milli>(stop - start).count();
 
     INFO_LOG << "Calculated time: " << time_ms << Endl;
 
@@ -60,9 +60,13 @@ void SolveTaskAndSave(IEquationSolver& solver,
 
         results.set_realsolutionname(*config.RealSolutionName);
         auto RealSolution = NLinalg::TMatrix(k + 1, n + 1);
-        for (usize i = 0; i <= k; i++) {
-            for (usize j = 0; j <= n; j++) {
-                RealSolution[i][j] = (*config.RealSolution)(config.LeftBound + j * config.SpaceStep, i * config.TimeStep);
+        for (usize j = 0; j <= k; j++) {
+            for (usize i = 0; i <= n; i++) {
+                if (i == n) {
+                    RealSolution[j][i] = config.RightBoundState(static_cast<f64>(j) * config.TimeStep);
+                } else {
+                    RealSolution[j][i] = (*config.RealSolution)(config.LeftBound + static_cast<f64>(i) * config.SpaceStep, static_cast<f64>(j) * config.TimeStep);
+                }
             }
         }
 
@@ -75,7 +79,7 @@ int main(int argc, char** argv) {
     NLogger::ChangeLogLevel(LOG_LEVEL);
     
     {   // file:///C:/Users/Igor/Desktop/c++/FDESolver/tasks/task1/task1.md
-        const double alpha = 1.5, gamma = 0.9;
+        const f64 alpha = 1.5, gamma = 0.9;
         TSolverConfig config = {
             .LeftBound = 0.0,
             .RightBound = 1.0,
@@ -85,16 +89,16 @@ int main(int argc, char** argv) {
             .SpaceStep = 0.052,
             .TimeStep = 0.01,
             .Beta = 1.0,
-            .DiffusionCoefficient = [alpha](double x){ return NFunctions::Gamma(3.0 - alpha) / NFunctions::Gamma(3.0) * std::pow(x, alpha); },
-            .DemolitionCoefficient = [](double x){ return 0.0; },
-            .ZeroTimeState = [](double x){ return 0.0; },
-            .SourceFunction = [gamma](double x, double t){ return NFunctions::Gamma(3.0) / NFunctions::Gamma(3.0 - gamma) * (std::pow(t, 2.0 - gamma) * std::pow(x, 2.0)) - std::pow(x, 2.0) * std::pow(t, 2.0); },
-            .LeftBoundState = [](double t){ return 0.0; },
-            .RightBoundState = [](double t){ return std::pow(t, 2.0); },
+            .DiffusionCoefficient = [alpha](f64 x){ return NFunctions::Gamma(3.0 - alpha) / NFunctions::Gamma(3.0) * std::pow(x, alpha); },
+            .DemolitionCoefficient = [](f64 x){ return 0.0; },
+            .ZeroTimeState = [](f64 x){ return 0.0; },
+            .SourceFunction = [gamma](f64 x, f64 t){ return NFunctions::Gamma(3.0) / NFunctions::Gamma(3.0 - gamma) * (std::pow(t, 2.0 - gamma) * std::pow(x, 2.0)) - std::pow(x, 2.0) * std::pow(t, 2.0); },
+            .LeftBoundState = [](f64 t){ return 0.0; },
+            .RightBoundState = [](f64 t){ return std::pow(t, 2.0); },
             .BordersAvailable = true,
-            .StochasticIterationCount = 800,
+            .StochasticIterationCount = 1000,
             .RealSolutionName = "Real solution: $u(x, t) = x^2 \\cdot t^2$",
-            .RealSolution = [](double x, double t){ return x*x*t*t; },
+            .RealSolution = [](f64 x, f64 t){ return x*x*t*t; },
         };
 
         TMatrixFDES<TMFDESRule> solver1(config);
@@ -123,14 +127,14 @@ int main(int argc, char** argv) {
             .SpaceStep = 0.02,
             .TimeStep = 0.001,
             .Beta = 0.5,
-            .DiffusionCoefficient = [](double x){ return .1; },
-            .DemolitionCoefficient = [](double x){ return 0.0; },
-            .ZeroTimeState = [](double x){ return -0.01 < x && x < 0.01 ? 50.0 : 0.0; },
-            .SourceFunction = [](double x, double t){ return 0.0; },
-            .LeftBoundState = [](double t){ return 0.0; },
-            .RightBoundState = [](double t){ return 0.0; },
+            .DiffusionCoefficient = [](f64 x){ return .1; },
+            .DemolitionCoefficient = [](f64 x){ return 0.0; },
+            .ZeroTimeState = [](f64 x){ return -0.01 < x && x < 0.01 ? 50.0 : 0.0; },
+            .SourceFunction = [](f64 x, f64 t){ return 0.0; },
+            .LeftBoundState = [](f64 t){ return 0.0; },
+            .RightBoundState = [](f64 t){ return 0.0; },
             .BordersAvailable = false,
-            .StochasticIterationCount = 100,
+            .StochasticIterationCount = 1000,
         };
 
         TMatrixFDES<TMFDESRule> solver1(config);

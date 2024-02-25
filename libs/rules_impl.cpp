@@ -1,9 +1,9 @@
 #include <rules_impl.hpp>
 
 namespace NEquationSolver {
-    double TMFDESRule::FillMatrix(IEquationSolver const *const solver, usize i, usize j) {
-        const double spaceX = solver->Space(i);
-        double result = 0.0;
+    f64 TMFDESRule::FillMatrix(IEquationSolver const *const solver, usize i, usize j) {
+        const f64 spaceX = solver->Space(i);
+        f64 result = 0.0;
 
         if (i + 1 >= j) {
             result += solver->CoefA(spaceX) * solver->CoefGAlpha(i - j + 1);
@@ -29,10 +29,10 @@ namespace NEquationSolver {
     }
 
     // Math: d_i^k = \sum_{j=1}^{k}{g_{\gamma, j}(u_i^{k-j} - u_i^0)} - (u_i^0 + \tau^\gamma f(x_i, t_j))
-    double TMFDESRule::FillDestination(IEquationSolver const *const solver, const NLinalg::TMatrix& result, usize i, usize k) {
+    f64 TMFDESRule::FillDestination(IEquationSolver const *const solver, const NLinalg::TMatrix& result, usize i, usize k) {
         const usize n = solver->GetConfig().SpaceCount;
 
-        double d_i = 0.0;
+        f64 d_i = 0.0;
 
         d_i -= result[0][i];
         d_i -= solver->PowTCGamma * solver->SourceFunction[k][i];
@@ -49,9 +49,9 @@ namespace NEquationSolver {
         // Math: \theta_1 = \theta_0 * (3^{2-\alpha}-2)
         // Math: \theta_k = \theta_0 * ((2k+1)^{2-\alpha}-2(2k-1)^{2-\alpha}+(2k-3)^{2-\alpha})
     */
-    double TRLFDESRule::CoefGMatrix(IEquationSolver const *const solver, usize k) {
-        const double alpha = solver->GetConfig().Alpha;
-        const double C0 = 1.0 / (NFunctions::Gamma(3.0 - alpha) * (std::pow(2.0, 2.0 - alpha)));
+    f64 TRLFDESRule::CoefGMatrix(IEquationSolver const *const solver, usize k) {
+        const f64 alpha = solver->GetConfig().Alpha;
+        const f64 C0 = 1.0 / (NFunctions::Gamma(3.0 - alpha) * (std::pow(2.0, 2.0 - alpha)));
         
         if (k == 0) {
             return C0;
@@ -61,10 +61,10 @@ namespace NEquationSolver {
         return C0 * (std::pow(2.0 * k - 3.0, 2.0 - alpha) - 2.0 * std::pow(2.0 * k - 1.0, 2.0 - alpha) + std::pow(2.0 * k + 1.0, 2.0 - alpha));
     }
 
-    double TRLFDESRule::FillMatrix(IEquationSolver const *const solver, usize i, usize j) {
-        const double spaceX = solver->Space(i);
-        const double n = solver->GetConfig().SpaceCount;
-        double result = 0.0;
+    f64 TRLFDESRule::FillMatrix(IEquationSolver const *const solver, usize i, usize j) {
+        const f64 spaceX = solver->Space(i);
+        const f64 n = solver->GetConfig().SpaceCount;
+        f64 result = 0.0;
 
         if (i + 1 >= j) { // Left
             if (i + 1 == j) {
@@ -105,9 +105,9 @@ namespace NEquationSolver {
         // Math: \theta_0 = \frac{1}{(1-\alpha)\Gamma(1-\alpha)}
         // Math: \theta_k = \theta_0 * (k^{1-\alpha} - (k-1)^{1-\alpha})
     */
-    double TRLFDESRule::CoefGDestination(IEquationSolver const *const solver, usize k) {
-        const double gamma = solver->GetConfig().Gamma;
-        const double C0 = 1.0 / NFunctions::Gamma(2.0 - gamma);
+    f64 TRLFDESRule::CoefGDestination(IEquationSolver const *const solver, usize k) {
+        const f64 gamma = solver->GetConfig().Gamma;
+        const f64 C0 = 1.0 / NFunctions::Gamma(2.0 - gamma);
         
         if (k == 0) {
             return C0;
@@ -117,10 +117,10 @@ namespace NEquationSolver {
     }
 
     // Math: d_i^k = -\theta_{k}u_i^0 + \sum_{j=1}^{k-1}{(\theta_{k-j+1}-\theta_{k-j})u_i^{j}} - \tau^\gamma f(x_i, t_j)
-    double TRLFDESRule::FillDestination(IEquationSolver const *const solver, const NLinalg::TMatrix& result, usize i, usize k) {
+    f64 TRLFDESRule::FillDestination(IEquationSolver const *const solver, const NLinalg::TMatrix& result, usize i, usize k) {
         const usize n = solver->GetConfig().SpaceCount;
 
-        double d_i = 0.0;
+        f64 d_i = 0.0;
 
         d_i -= CoefGDestination(solver, k) * result[0][i];
         for (usize j = 1; j < k; j++) {
