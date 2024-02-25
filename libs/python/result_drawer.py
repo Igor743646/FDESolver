@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+import matplotlib.animation as animation
 import matplotlib as mpl
 import argparse
 from argparse import ArgumentParser
@@ -12,6 +13,7 @@ except:
 mpl.rcParams["savefig.format"] = "jpg"
 mpl.rcParams["savefig.dpi"] = 'figure'
 mpl.rcParams["savefig.bbox"] = 'tight'
+plt.rcParams['animation.ffmpeg_path'] ='C:\\ProgramData\\chocolatey\\lib\\ffmpeg-full\\tools\\ffmpeg\\bin\\ffmpeg.exe'
 
 class Result(object):
 
@@ -156,7 +158,50 @@ def draw_text_matrix(matrix):
     ax.set_title("Matrix A")
     str_matrix = " \n ".join([" ".join([f"{i:.3f}" for i in row]) for row in matrix.tolist()])
     ax.text(0.5, 0.5, str_matrix, ha="center", va="center")
+
+
+def draw_slices_gif(config, results : Results):
+    tasks = results.results
+
+    count = len(tasks) + (1 if results.real_solution is not None else 0)
+
+    ymin, ymax = np.min([np.min(i.field) for i in tasks]), np.max([np.max(i.field) for i in tasks])
+    fig, ax = plt.subplots(1, 1, figsize=(15, 10))
+    lines = ax.plot(*[[] for i in range(2 * count)])
+
+    def init():
+        ax.set_xlim((config.LeftBound, config.RightBound))
+        ax.set_ylim((0, ymax))
+        
+        for line in lines:
+            line.set_data([], [])
+        return lines
+
+    def animate(i):
+        X = np.linspace(config.LeftBound, config.RightBound, config.SpaceCount + 1)
+
+        for line_id, line in enumerate(lines):
+            if results.real_solution is not None and line_id == len(lines) - 1:
+                Y = results.real_solution
+                label = results.real_solution_name
+            else:
+                Y = tasks[line_id].field
+                label = tasks[line_id].method_name
+            
+            line.set_data(X, Y[i])
+            line.set_label(f"{label}")
+        ymin, ymax = ax.get_ylim()
+        ax.set_ylim((ymin, np.max([np.max(task.field[i]) for task in tasks] + [ymin + 0.1])))
+        ax.set_title(f"Time slice t={i * config.TimeStep:.2f}")
+        ax.grid(True)
+        ax.legend(loc='best')
+        return lines
     
+    anim = animation.FuncAnimation(fig, func=animate, init_func=init,
+                                   frames=config.TimeCount + 1, interval=20)
+    
+    return anim
+
 
 def draw(results : Results, arguments : argparse.Namespace):
     outputs = {
@@ -165,6 +210,7 @@ def draw(results : Results, arguments : argparse.Namespace):
         "SS" : arguments.out + f'Solution Surface',
         "ER" : arguments.out + f'Error',
         "TS" : arguments.out + f'Time Slice',
+        "GS" : arguments.out + f'Time Slices GIF',
     }
 
     draw_flat_field(results.config, results.results)
@@ -172,6 +218,11 @@ def draw(results : Results, arguments : argparse.Namespace):
 
     draw_surface(results.config, results)
     plt.savefig(outputs['SS'])
+
+    gif = draw_slices_gif(results.config, results)
+    FFwriter = animation.FFMpegWriter(fps=60)
+    gif.save(outputs["GS"] + ".mp4", writer = FFwriter)
+    gif.save(outputs["GS"] + ".gif", fps=60)
 
     if arguments.time_slice is not None:
         draw_time_slice(results.config, 

@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
             .LeftBoundState = [](f64 t){ return 0.0; },
             .RightBoundState = [](f64 t){ return std::pow(t, 2.0); },
             .BordersAvailable = true,
-            .StochasticIterationCount = 1000,
+            .StochasticIterationCount = 5000,
             .RealSolutionName = "Real solution: $u(x, t) = x^2 \\cdot t^2$",
             .RealSolution = [](f64 x, f64 t){ return x*x*t*t; },
         };
@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
             .LeftBoundState = [](f64 t){ return 0.0; },
             .RightBoundState = [](f64 t){ return 0.0; },
             .BordersAvailable = false,
-            .StochasticIterationCount = 1000,
+            .StochasticIterationCount = 5000,
         };
 
         TMatrixFDES<TMFDESRule> solver1(config);

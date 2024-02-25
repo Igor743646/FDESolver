@@ -78,7 +78,7 @@ namespace NEquationSolver {
 
             // Симуляция
             std::random_device device;
-            std::mt19937_64 engine(device());
+            std::knuth_b engine(device());  // knuth better than mt19937
             std::uniform_real_distribution<f64> generator(0.0, 1.0);
 
             for (i64 i = 1; i < n; i++) {
