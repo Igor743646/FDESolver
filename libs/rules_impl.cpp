@@ -44,6 +44,33 @@ namespace NEquationSolver {
         return d_i;
     }
 
+    f64 TMFDESRule::FillProbabilities(IEquationSolver const *const solver, const NLinalg::TMatrix& probabilities, usize i, usize p) {
+        const usize n = solver->GetConfig().SpaceCount;
+        const usize k = solver->GetConfig().TimeCount;
+        const double alpha = solver->GetConfig().Alpha;
+        const double gamma = solver->GetConfig().Gamma;
+
+        double a00 = solver->CoefA(solver->Space(i)), b00 = solver->CoefB(solver->Space(i)), c00 = solver->CoefC(solver->Space(i));
+
+        if (p < n - 1) {
+            return b00 * solver->CoefGAlpha(n - p + 1); 
+        } else if (p == n - 1) {
+            return a00 + b00 * solver->CoefGAlpha(2) + c00;
+        } else if (p == n) {
+            return gamma - alpha * (a00 + b00);
+        } else if (p == n + 1) {
+            return a00 * solver->CoefGAlpha(2) + b00 - c00;
+        } else if (n + 1 < p && p <= 2 * n) {
+            return a00 * solver->CoefGAlpha(p - n + 1);
+        } else if (2 * n < p && p <= 2 * n + k) {
+            return -solver->CoefGGamma(p - 2 * n + 1);
+        } else {
+            return 1.0 - std::accumulate(probabilities[i], probabilities[i + 1], 0.0);
+        }
+
+        __builtin_unreachable();
+    }
+
     /*
         // Math: \theta_0 = \frac{1}{(2-\alpha)\Gamma(2-\alpha)2^{2-\alpha}}
         // Math: \theta_1 = \theta_0 * (3^{2-\alpha}-2)
@@ -130,5 +157,11 @@ namespace NEquationSolver {
         d_i -= solver->PowTCGamma * solver->SourceFunction[k][i];
         
         return d_i;
+    }
+
+    f64 TRLFDESRule::FillProbabilities(IEquationSolver const *const solver, const NLinalg::TMatrix& probabilities, usize i, usize p) {
+        
+        UNIMPLEMENTED("Can not fill probs");
+        return 0.0;
     }
 }

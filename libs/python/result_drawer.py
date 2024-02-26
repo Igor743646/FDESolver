@@ -210,7 +210,7 @@ def draw(results : Results, arguments : argparse.Namespace):
         "SS" : arguments.out + f'Solution Surface',
         "ER" : arguments.out + f'Error',
         "TS" : arguments.out + f'Time Slice',
-        "GS" : arguments.out + f'Time Slices GIF',
+        "GS" : arguments.out + f'Dynamic time Slices',
     }
 
     draw_flat_field(results.config, results.results)
