@@ -67,7 +67,6 @@ namespace NEquationSolver {
                         i64 x = i, y = j;
 
                         usize rnd_id = _n * ((k) * k * (n - 1)) + (j-1) * (k * (n - 1)) + (i-1) * (k);
-
                         f64 sf = 0.0;
 
                         while (y > 0 && x < n && x > 0) {
