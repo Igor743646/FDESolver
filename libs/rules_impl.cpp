@@ -49,25 +49,26 @@ namespace NEquationSolver {
         const double alpha = solver->GetConfig().Alpha;
         const double gamma = solver->GetConfig().Gamma;
 
-        double a00 = solver->CoefA(i), b00 = solver->CoefB(i), c00 = solver->CoefC(i);
-
         if (p < n - 1) {
-            return b00 * solver->CoefGAlpha(n - p + 1); 
-        } else if (p == n - 1) {
-            return a00 + b00 * solver->CoefGAlpha(2) + c00;
-        } else if (p == n) {
-            return gamma - alpha * (a00 + b00);
-        } else if (p == n + 1) {
-            return a00 * solver->CoefGAlpha(2) + b00 - c00;
-        } else if (n + 1 < p && p <= 2 * n) {
-            return a00 * solver->CoefGAlpha(p - n + 1);
-        } else if (2 * n < p && p <= 2 * n + k) {
+            return solver->CoefB(i) * solver->CoefGAlpha(n - p + 1); 
+        } 
+        if (p == n - 1) {
+            return solver->CoefA(i) + solver->CoefB(i) * solver->CoefGAlpha(2) + solver->CoefC(i);
+        } 
+        if (p == n) {
+            return gamma - alpha * (solver->CoefA(i) + solver->CoefB(i));
+        } 
+        if (p == n + 1) {
+            return solver->CoefA(i) * solver->CoefGAlpha(2) + solver->CoefB(i) - solver->CoefC(i);
+        } 
+        if (n + 1 < p && p <= 2 * n) {
+            return solver->CoefA(i) * solver->CoefGAlpha(p - n + 1);
+        } 
+        if (2 * n < p && p <= 2 * n + k) {
             return -solver->CoefGGamma(p - 2 * n + 1);
-        } else {
-            return 1.0 - std::accumulate(probabilities[i], probabilities[i + 1], 0.0);
-        }
+        } 
 
-        __builtin_unreachable();
+        return 1.0 - std::accumulate(probabilities[i], probabilities[i + 1], 0.0);
     }
 
     /*

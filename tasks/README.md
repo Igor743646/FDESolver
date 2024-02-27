@@ -137,14 +137,12 @@ $$\frac{(I-E^{-h})^\alpha f(x)}{h^\alpha} = \frac{1}{h^\alpha} \sum_{i=0}^{\inft
 |1.|$$x^n$$|$$\frac{\Gamma(n+1)}{\Gamma(n-m+1)}x^{n-m}$$|
 |2.|$$f(x)g(x)$$|$$\sum_{i=0}^{m}{ {m \choose i} \frac{d^{m-i}}{dx^{m-i}}f(x) \frac{d^i}{dx^i}g(x) }$$|
 
-Таблица 2 - таблица интегралов и производных
-|$№$|$f(x)$|$$\int_a^b{\frac{f(s)ds}{(x-s)^\alpha}}$$|$$D^\alpha_{a+,x}f(x)=\frac{1}{\Gamma(m-\alpha)}\frac{d^m}{dx^m}\int_a^x{\frac{f(s)ds}{(x-s)^{1+\alpha-m}}}$$|
-|-|-|-|-|
-|1.|$A$|$$A \cdot K(x, a, b, 1-\alpha)$$|$$\frac{A}{\Gamma(1-\alpha)}(x-a)^{-\alpha}$$|
-|2.|$Ax+B$|$$A \cdot K(x, b, a, 2-\alpha) + (Ax+B) K(x, a, b, 1-\alpha)$$||
-|3.|$Ax^n$|$$A \cdot \sum_{i=0}^{n}{(-1)^i {n \choose i} x^{n-i} K(x, a, b, i+1-\alpha) }$$||
-|4.|$Ax^\beta$|$$Ax^{1+\beta-\alpha} \int_{1-\frac{b}{x}}^{1-\frac{a}{x}}{p^{-\alpha} (1-p)^\beta dp}$$ | $$\frac{A}{\Gamma(m-\alpha)} \left[ \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+1)} x^{\beta-\alpha} B_{1-\frac{a}{x}}(m-\alpha, \beta+1) + \sum_{i=1}^{m} {{m \choose i} \left(  \frac{\Gamma(m+\beta-\alpha+1)}{\Gamma(\beta-\alpha+i+1)} x^{\beta-\alpha+i}\right) \frac{d^{i-1}}{dx^{i-1}}\left( a^{\beta+1} \frac{(x-a)^{m-\alpha-1}}{x^{m+\beta-\alpha+1}} \right) } \right]$$ <br> При $a=0$ всё упрощается: <br> $$\frac{\Gamma(\beta+1)}{\Gamma(\beta-\alpha+1)} A x^{\beta-\alpha}$$|
-|5.|$(Ax+B)^n$|$$\sum_{i=0}^{n}{\sum_{j=0}^{n-i}{  (-1)^j A^{n-i}B^i{n \choose i}{n-i \choose j} x^{n-i-j} K(x, a, b, j+1-\alpha)   }}$$||
+Таблица 2 - таблица производных
+|$№$|$f(x)$|$$D^\alpha_{a+,x}f(x)=\frac{1}{\Gamma(m-\alpha)}\frac{d^m}{dx^m}\int_a^x{\frac{f(s)ds}{(x-s)^{1+\alpha-m}}}$$|
+|-|-|-|
+|1.|$A$ | $$\frac{A}{\Gamma(1 - \alpha)}(x-a)^{-\alpha}$$ |
+|2.|$A(x-a)^\beta$ | $$\frac{A \cdot \Gamma(\beta + 1)}{\Gamma(\beta + 1 - \alpha)}(x-a)^{\beta - \alpha}$$ |
+|3.|$(x-a)^{\beta}ln(x-a)$ | $$\frac{\Gamma(\beta + 1)}{\Gamma(\beta + 1 - \alpha)}(x-a)^{\beta - \alpha} \left[ ln(x-a) + \psi^{(0)}(\beta + 1) - \psi^{(0)}(\beta + 1 - \alpha) \right]$$ |
 
 **Вспомогательные равенства:**
 
@@ -221,15 +219,15 @@ $$
 
 $$\left. \frac{\partial_+^\alpha}{\partial x^\alpha}u(x, t)\right|_ {i} = \frac{1}{\Gamma(2-\alpha)}\frac{d^2}{d x^2} \int\limits_{a}^{x}{\frac{u(s, t)}{(x-s)^{\alpha-1}}ds} = \frac{1}{\Gamma(2-\alpha)} \frac{{}_ +F_{i+\frac{1}{2}}^k - {}_ +F_{i-\frac{1}{2}}^k}{h}$$
 
-$${}_ +F_{i+\frac{1}{2}}^k = \frac{d}{dx_{i+\frac{1}{2}}} \int\limits_{a}^{x_{1+\frac{1}{2}}}{\frac{u(s, t)}{(x_{1+\frac{1}{2}}-s)^{\alpha-1}}ds} = \frac{d}{dx_{i+\frac{1}{2}}} 
+$${}_ +F_{i+\frac{1}{2}}^k = \frac{d}{dx_{i+\frac{1}{2}}} \int\limits_{a}^{x_{i+\frac{1}{2}}}{\frac{u(s, t)}{(x_{i+\frac{1}{2}}-s)^{\alpha-1}}ds} = \frac{d}{dx_{i+\frac{1}{2}}} 
 \left[ 
-    \sum_{j=0}^{i-1}{\int\limits_{x_j}^{x_{j+1}}{\frac{A_js+B_j}{(x_{1+\frac{1}{2}}-s)^{\alpha-1}}ds}} + \int\limits_{x_i}^{x_{1+\frac{1}{2}}}{\frac{A_is+B_i}{(x_{1+\frac{1}{2}}-s)^{\alpha-1}}ds} 
+    \sum_{j=0}^{i-1}{\int\limits_{x_j}^{x_{j+1}}{\frac{A_js+B_j}{(x_{i+\frac{1}{2}}-s)^{\alpha-1}}ds}} + \int\limits_{x_i}^{x_{i+\frac{1}{2}}}{\frac{A_is+B_i}{(x_{i+\frac{1}{2}}-s)^{\alpha-1}}ds} 
 \right]
 $$
 
-$${}_ +F_{i-\frac{1}{2}}^k = \frac{d}{dx_{i-\frac{1}{2}}} \int\limits_{a}^{x_{1-\frac{1}{2}}}{\frac{u(s, t)}{(x_{1-\frac{1}{2}}-s)^{\alpha-1}}ds} = \frac{d}{dx_{i-\frac{1}{2}}} 
+$${}_ +F_{i-\frac{1}{2}}^k = \frac{d}{dx_{i-\frac{1}{2}}} \int\limits_{a}^{x_{i-\frac{1}{2}}}{\frac{u(s, t)}{(x_{i-\frac{1}{2}}-s)^{\alpha-1}}ds} = \frac{d}{dx_{i-\frac{1}{2}}} 
 \left[ 
-    \sum_{j=0}^{i-2}{\int\limits_{x_j}^{x_{j+1}}{\frac{A_js+B_j}{(x_{1-\frac{1}{2}}-s)^{\alpha-1}}ds}} + \int\limits_{x_{i-1}}^{x_{1-\frac{1}{2}}}{\frac{A_{i-1}s+B_{i-1}}{(x_{1-\frac{1}{2}}-s)^{\alpha-1}}ds} 
+    \sum_{j=0}^{i-2}{\int\limits_{x_j}^{x_{j+1}}{\frac{A_js+B_j}{(x_{i-\frac{1}{2}}-s)^{\alpha-1}}ds}} + \int\limits_{x_{i-1}}^{x_{i-\frac{1}{2}}}{\frac{A_{i-1}s+B_{i-1}}{(x_{i-\frac{1}{2}}-s)^{\alpha-1}}ds} 
 \right]
 $$
 
@@ -248,23 +246,56 @@ $$
 
 ---
 
+Получаем следующие потоки:
+
 $${}_ +F_{i+\frac{1}{2}}^k =
 \sum_{j=0}^{i-1}{\left[ A_j \frac{h^{2-\alpha}}{2-\alpha}\left[ (i-j+\frac{1}{2})^{2-\alpha} - (i-j-\frac{1}{2})^{2-\alpha} \right] \right]} + A_i\frac{h^{2-\alpha}}{2-\alpha}\frac{1}{2^{2-\alpha}}
 $$
 
+
 $${}_ +F_{i-\frac{1}{2}}^k =
-\sum_{j=0}^{i-2}{\left[ A_j \frac{h^{2-\alpha}}{2-\alpha}\left[ (i-j-\frac{1}{2})^{2-\alpha} - (i-j-\frac{3}{2})^{2-\alpha} \right] \right]} + A_{i-1}\frac{h^{2-\alpha}}{2-\alpha}\frac{1}{2^{2-\alpha}}
+\sum_{j=0}^{i-2}{\left[ A_j \frac{h^{2-\alpha}}{2-\alpha}\left[ (i-j-\frac{1}{2})^{2-\alpha} - (i-j-\frac{3}{2})^{2-\alpha} \right] \right]} + A_{i-1}\frac{h^{2-\alpha}}{2-\alpha}\frac{1}{2^{2-\alpha}} = 
 $$
 
----
+Выносим общие множители:
 
-$G_0 = \frac{1}{\Gamma(2-\alpha)(2-\alpha)2^{2-\alpha}}$
-
-$G_1 = G_0 \cdot (3^{2-\alpha} - 2)$
-
-$G_k = G_0 \cdot ((2k+1)^{2-\alpha}-2(2k-1)^{2-\alpha}+(2k-3)^{2-\alpha}); k \geq 2$
+$${}_ +F_{i+\frac{1}{2}}^k =
+\frac{h^{2-\alpha}}{(2-\alpha)2^{2-\alpha}} \left( \sum_{j=0}^{i-2}{\left[ A_j \left[ (2(i-j)+1)^{2-\alpha} - (2(i-j)-1)^{2-\alpha} \right] \right]} + A_i + (3^{2-\alpha}-1)A_{i-1}\right)
+$$
 
 
+$${}_ +F_{i-\frac{1}{2}}^k =
+\frac{h^{2-\alpha}}{(2-\alpha)2^{2-\alpha}} \left( \sum_{j=0}^{i-2}{\left[ A_j \left[ (2(i-j)-1)^{2-\alpha} - (2(i-j)-3)^{2-\alpha} \right] \right]} + A_{i-1} \right)
+$$
+
+В промежуточном виде имеем:
+
+$$\left. \frac{\partial^\alpha}{\partial x^\alpha}u(x, t) \right|_{i} = 
+\frac{h^{1-\alpha}}{\Gamma(3-\alpha)2^{2-\alpha}} \cdot \left( \sum_{j=0}^{i-2}{\left[ A_j \left[ (2(i-j)+1)^{2-\alpha} -2(2(i-j)-1)^{2-\alpha} + (2(i-j)-3)^{2-\alpha} \right] \right]} + A_{i} + (3^{2-\alpha}-2)A_{i-1} \right)
+$$
+
+Введём следующие обозначения:
+
+$$G_0 = \frac{1}{\Gamma(3-\alpha)2^{2-\alpha}}$$
+$$G_1 = G_0 \cdot (3^{2-\alpha} - 2)$$
+$$G_k = G_0 \cdot ((2k+1)^{2-\alpha}-2(2k-1)^{2-\alpha}+(2k-3)^{2-\alpha}); k \geq 2$$
+
+Получаем:
+
+$$\left. \frac{\partial^\alpha}{\partial x^\alpha}u(x, t) \right|_{i} = 
+\frac{1}{h^{\alpha - 1}} \cdot \left( \sum_{j=0}^{i-2}(A_j G_{i-j}) + G_0A_{i} + G_1A_{i-1} \right) = 
+\frac{1}{h^{\alpha}} \cdot \left( \sum_{j=0}^{i-2}((u_{j+1}^k-u_j^k) G_{i-j}) + G_0(u_{i+1}^k-u_i^k) + G_1(u_{i}^k-u_{i-1}^k) \right) = \\
+\frac{1}{h^{\alpha}} \cdot \left( \sum_{j=1}^{i-1}u_{j}^k G_{i-j+1} - \sum_{j=0}^{i-2}u_j^k G_{i-j} + G_0(u_{i+1}^k-u_i^k) + G_1(u_{i}^k-u_{i-1}^k) \right) = \\
+\frac{1}{h^{\alpha}} \cdot \left( \sum_{j=1}^{i-2}u_{j}^k (G_{i-j+1} - G_{i-j}) + G_{2} u^k_{i-1} - G_{i} u^k_{0} + G_0(u_{i+1}^k-u_i^k) + G_1(u_{i}^k-u_{i-1}^k) \right)
+$$
+
+Итого имеем:
+
+$$\left. \frac{\partial _+^\alpha}{\partial x^\alpha}u(x, t) \right|_{i} =
+\frac{1}{h^{\alpha}} \cdot \left(-G_{i} u^k_{0} + \sum_{j=1}^{i-2}u_{j}^k (G_{i-j+1} - G_{i-j}) + (G_2-G_1) u^k_{i-1} + (G_1-G_0) u_{i}^k + G_0 u_{i+1}^k \right)
+$$
+
+Тогда матрица для левой производной будет иметь следующий вид:
 
 $$ L =
 \begin{pmatrix}
@@ -277,6 +308,32 @@ G_1-G_0 & G_0 & 0 & 0 & \dots & 0 & 0 \\
 -G_n & G_n-G_{n-1} & G_{n-1}-G_{n-2} & G_{n-2}-G_{n-3} & \dots & G_2-G_1 & G_1-G_0
 \end{pmatrix}
 $$
+
+Можно заметить, что сумма во всех строках матрицы кроме первой и последней будут равны нулю.
+
+Для правой производной будет следующая формула:
+
+$$\left. \frac{\partial _-^\alpha}{\partial x^\alpha}u(x, t)\right|_ {i} = \frac{1}{\Gamma(2-\alpha)}\frac{d^2}{d x^2} \int\limits_{x}^{b}{\frac{u(s, t)}{(s-x)^{\alpha-1}}ds} = \frac{1}{\Gamma(2-\alpha)} \frac{{}_ -F_{i+\frac{1}{2}}^k - {}_ -F_{i-\frac{1}{2}}^k}{h}$$
+
+$${}_ -F_{i+\frac{1}{2}}^k = -\frac{d}{dx_{i+\frac{1}{2}}} \int\limits^{b}_{x_{i+\frac{1}{2}}}{\frac{u(s, t)}{(s-x_{i+\frac{1}{2}})^{\alpha-1}}ds} = \frac{d}{dx_{i+\frac{1}{2}}} 
+\left[ 
+    \sum_{j=i+1}^{n-1}{\int\limits_{x_j}^{x_{j+1}}{\frac{A_js+B_j}{(s-x_{i+\frac{1}{2}})^{\alpha-1}}ds}} + \int\limits_{x_i+\frac{1}{2}}^{x_{i+1}}{\frac{A_is+B_i}{(s-x_{i+\frac{1}{2}})^{\alpha-1}}ds} 
+\right]
+$$
+
+$${}_ -F_{i-\frac{1}{2}}^k = -\frac{d}{dx_{i-\frac{1}{2}}} \int\limits^{b}_{x_{i-\frac{1}{2}}}{\frac{u(s, t)}{(s-x_{i-\frac{1}{2}})^{\alpha-1}}ds} = \frac{d}{dx_{i-\frac{1}{2}}} 
+\left[ 
+    \sum_{j=i}^{n-1}{\int\limits_{x_j}^{x_{j+1}}{\frac{A_js+B_j}{(s-x_{i-\frac{1}{2}})^{\alpha-1}}ds}} + \int\limits_{x_{i-\frac{1}{2}}}^{x_{i}}{\frac{A_{i-1}s+B_{i-1}}{(s-x_{i-\frac{1}{2}})^{\alpha-1}}ds} 
+\right]
+$$
+
+Имеем по итогу для правой производной:
+
+$$\left. \frac{\partial _-^\alpha}{\partial x^\alpha}u(x, t) \right|_{i} =
+\frac{1}{h^{\alpha}} \cdot \left(-G_0 u^k_{i-1} + (G_0 - G_1) u^k_{i} + \sum_{j=i+1}^{n-1}u_{j}^k (G_{j-i} - G_{j-i+1}) + G_{n-i} u_{n}^k \right)
+$$
+
+И матрица:
 
 $$ R =
 \begin{pmatrix}
