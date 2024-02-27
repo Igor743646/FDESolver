@@ -99,6 +99,9 @@ namespace NEquationSolver {
         f64 CoefA(f64) const;
         f64 CoefB(f64) const;
         f64 CoefC(f64) const;
+        f64 CoefA(usize) const;
+        f64 CoefB(usize) const;
+        f64 CoefC(usize) const;
         f64 CoefG(f64, usize) const;
         f64 CoefGAlpha(usize) const;
         f64 CoefGGamma(usize) const;

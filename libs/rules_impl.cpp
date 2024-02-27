@@ -2,15 +2,14 @@
 
 namespace NEquationSolver {
     f64 TMFDESRule::FillMatrix(IEquationSolver const *const solver, usize i, usize j) {
-        const f64 spaceX = solver->Space(i);
         f64 result = 0.0;
 
         if (i + 1 >= j) {
-            result += solver->CoefA(spaceX) * solver->CoefGAlpha(i - j + 1);
+            result += solver->CoefA(i) * solver->CoefGAlpha(i - j + 1);
         }
 
         if (i <= j + 1) {
-            result += solver->CoefB(spaceX) * solver->CoefGAlpha(j - i + 1);
+            result += solver->CoefB(i) * solver->CoefGAlpha(j - i + 1);
         }
 
         if (i == j) {
@@ -18,11 +17,11 @@ namespace NEquationSolver {
         }
 
         if (i == j + 1) {
-            result -= solver->CoefC(spaceX);
+            result -= solver->CoefC(i);
         }
 
         if (i + 1 == j) {
-            result += solver->CoefC(spaceX);
+            result += solver->CoefC(i);
         }
 
         return result;
@@ -50,7 +49,7 @@ namespace NEquationSolver {
         const double alpha = solver->GetConfig().Alpha;
         const double gamma = solver->GetConfig().Gamma;
 
-        double a00 = solver->CoefA(solver->Space(i)), b00 = solver->CoefB(solver->Space(i)), c00 = solver->CoefC(solver->Space(i));
+        double a00 = solver->CoefA(i), b00 = solver->CoefB(i), c00 = solver->CoefC(i);
 
         if (p < n - 1) {
             return b00 * solver->CoefGAlpha(n - p + 1); 
@@ -89,27 +88,26 @@ namespace NEquationSolver {
     }
 
     f64 TRLFDESRule::FillMatrix(IEquationSolver const *const solver, usize i, usize j) {
-        const f64 spaceX = solver->Space(i);
         const f64 n = solver->GetConfig().SpaceCount;
         f64 result = 0.0;
 
         if (i + 1 >= j) { // Left
             if (i + 1 == j) {
-                result += solver->CoefA(spaceX) * CoefGMatrix(solver, 0);
+                result += solver->CoefA(i) * CoefGMatrix(solver, 0);
             } else if (j == 0 && i > 0) {
-                result -= solver->CoefA(spaceX) * CoefGMatrix(solver, i);
+                result -= solver->CoefA(i) * CoefGMatrix(solver, i);
             } else {
-                result += solver->CoefA(spaceX) * (CoefGMatrix(solver, i - j + 1) - CoefGMatrix(solver, i - j));
+                result += solver->CoefA(i) * (CoefGMatrix(solver, i - j + 1) - CoefGMatrix(solver, i - j));
             }
         }
 
         if (i <= j + 1) { // Right
             if (i == j + 1) {
-                result += solver->CoefB(spaceX) * CoefGMatrix(solver, 0);
+                result += solver->CoefB(i) * CoefGMatrix(solver, 0);
             } else if (j == n && i < n) {
-                result -= solver->CoefB(spaceX) * CoefGMatrix(solver, n - j);
+                result -= solver->CoefB(i) * CoefGMatrix(solver, n - j);
             } else {
-                result += solver->CoefB(spaceX) * (CoefGMatrix(solver, j - i + 1) - CoefGMatrix(solver, j - i));
+                result += solver->CoefB(i) * (CoefGMatrix(solver, j - i + 1) - CoefGMatrix(solver, j - i));
             }
         }
 
@@ -118,11 +116,11 @@ namespace NEquationSolver {
         }
 
         if (i == j + 1) {
-            result -= solver->CoefC(spaceX);
+            result -= solver->CoefC(i);
         }
 
         if (i + 1 == j) {
-            result += solver->CoefC(spaceX);
+            result += solver->CoefC(i);
         }
 
         return result;

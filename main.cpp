@@ -117,6 +117,47 @@ int main(int argc, char** argv) {
         }
     }
 
+    {   // file:///C:/Users/Igor/Desktop/c++/FDESolver/tasks/task1/task1.md
+        const f64 alpha = 1.5, gamma = 0.9;
+        const f64 a = 3.0;
+        const f64 b = 6.0;
+        TSolverConfig config = {
+            .LeftBound = a+0.000001,
+            .RightBound = b,
+            .MaxTime = 0.01,
+            .Alpha = alpha,
+            .Gamma = gamma,
+            .SpaceStep = 0.1,
+            .TimeStep = 0.0001,
+            .Beta = 1.0,
+            .DiffusionCoefficient = [alpha, a](f64 x){ return NFunctions::Gamma(2.0 - alpha) * std::pow(x - a, alpha) * (std::log(x - a) + 1); },
+            .DemolitionCoefficient = [alpha, a](f64 x){ return (a - x) * (std::log(x - a) + std::lgamma(2) - std::lgamma(2.0 - alpha)); },
+            .ZeroTimeState = [](f64 x){ return 0.0; },
+            .SourceFunction = [gamma, a](f64 x, f64 t){ return 1.0 / NFunctions::Gamma(2.0 - gamma) * (x - a) * std::log(x - a) * std::pow(t, 1 - gamma); },
+            .LeftBoundState = [](f64 t){ return 0.0; },
+            .RightBoundState = [a, b](f64 t){ return (b - a) * std::log(b - a) * t; },
+            .BordersAvailable = true,
+            .StochasticIterationCount = 1000,
+            .RealSolutionName = "Real solution: $u(x, t) = (x-a) \\cdot ln(x-a) \\cdot t$",
+            .RealSolution = [a](f64 x, f64 t){ return (x - a) * std::log(x - a) * t; },
+        };
+
+        TMatrixFDES<TMFDESRule> solver1(config);
+        TMatrixFDES<TRLFDESRule> solver2(config);
+        TStochasticFDES<TMFDESRule> solver3(config);
+
+        PFDESolver::TResults results;
+        results.set_allocated_task(new PFDESolver::TSolverConfig(config.ToProto()));
+
+        SolveTaskAndSave(solver1, results, true, true);
+        SolveTaskAndSave(solver2, results, true, true);
+        SolveTaskAndSave(solver3, results, true, true);
+
+        if (!SaveResultsToFile("result2.bin", results)) {
+            ERROR_LOG << "Crushed saving" << Endl;
+        }
+    }
+
     {   // file:///C:/Users/Igor/Desktop/c++/FDESolver/tasks/task2/task2.md
         TSolverConfig config = {
             .LeftBound = -0.4,
@@ -148,7 +189,7 @@ int main(int argc, char** argv) {
         SolveTaskAndSave(solver2, results, true, true);
         SolveTaskAndSave(solver3, results, true, true);
 
-        if (!SaveResultsToFile("result2.bin", results)) {
+        if (!SaveResultsToFile("result3.bin", results)) {
             ERROR_LOG << "Crushed saving" << Endl;
         }
     }

@@ -181,6 +181,22 @@ namespace NEquationSolver {
         return Config.DemolitionCoefficient(x) * PowTCGamma / 2.0 / Config.SpaceStep;
     }
 
+    f64 IEquationSolver::CoefA(usize i) const {
+        return (1.0 + Config.Beta) 
+        * (DiffusionCoefficient[i] / 2.0) 
+        * (PowTCGamma / PowSCAlpha);
+    }
+
+    f64 IEquationSolver::CoefB(usize i) const {
+        return (1.0 - Config.Beta) 
+        * (DiffusionCoefficient[i] / 2.0) 
+        * (PowTCGamma / PowSCAlpha);
+    }
+
+    f64 IEquationSolver::CoefC(usize j) const {
+        return DemolitionCoefficient[j] * PowTCGamma / 2.0 / Config.SpaceStep;
+    }
+
     const TSolverConfig& IEquationSolver::GetConfig() const {
         return Config;
     }

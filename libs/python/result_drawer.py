@@ -171,15 +171,15 @@ def draw_slices_gif(config, results : Results):
 
     def init():
         ax.set_xlim((config.LeftBound, config.RightBound))
-        ax.set_ylim((0, ymax))
+        ax.set_ylim((ymin, ymax))
         
         for line in lines:
             line.set_data([], [])
         return lines
 
-    def animate(i):
-        X = np.linspace(config.LeftBound, config.RightBound, config.SpaceCount + 1)
+    X = np.linspace(config.LeftBound, config.RightBound, config.SpaceCount + 1)
 
+    def animate(i):
         for line_id, line in enumerate(lines):
             if results.real_solution is not None and line_id == len(lines) - 1:
                 Y = results.real_solution
@@ -210,7 +210,7 @@ def draw(results : Results, arguments : argparse.Namespace):
         "SS" : arguments.out + f'Solution Surface',
         "ER" : arguments.out + f'Error',
         "TS" : arguments.out + f'Time Slice',
-        "GS" : arguments.out + f'Dynamic time Slices',
+        "DS" : arguments.out + f'Dynamic time slices',
     }
 
     draw_flat_field(results.config, results.results)
@@ -221,8 +221,8 @@ def draw(results : Results, arguments : argparse.Namespace):
 
     gif = draw_slices_gif(results.config, results)
     FFwriter = animation.FFMpegWriter(fps=60)
-    gif.save(outputs["GS"] + ".mp4", writer = FFwriter)
-    gif.save(outputs["GS"] + ".gif", fps=60)
+    gif.save(outputs["DS"] + ".mp4", writer = FFwriter)
+    gif.save(outputs["DS"] + ".gif", fps=60)
 
     if arguments.time_slice is not None:
         draw_time_slice(results.config, 
@@ -235,6 +235,9 @@ def draw(results : Results, arguments : argparse.Namespace):
         plt.savefig(outputs['ER'])
 
     if arguments.verbose:
+        for task in results.results:
+            if task.solver_matrix is not None:
+                draw_text_matrix(task.solver_matrix)
         plt.show()
 
 

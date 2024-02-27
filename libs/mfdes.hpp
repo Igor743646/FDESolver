@@ -39,6 +39,7 @@ namespace NEquationSolver {
 
             TMatrix A(n + 1);
             FillMatrix(A);
+            INFO_LOG << A << Endl;
 
             auto plu = A.LUFactorizing();
             
