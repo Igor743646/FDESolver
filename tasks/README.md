@@ -238,8 +238,7 @@ $A_j = \frac{u_{j+1}^k - u_j^k}{h} $
 $$
 \frac{d}{dx_{p}} \int\limits_{x_j}^{x_{j+1}}{\frac{A_js+B_j}{(x_{p}-s)^{\alpha-1}}ds} \overset{(1)}{=} 
 \frac{d}{dx_{p}} \int\limits_{h(p-j-1)}^{h(p-j)}{\frac{A_j(x_p - t)+B_j}{t^{\alpha-1}}dt} =
-\frac{d}{dx_{p}} \int\limits_{h(p-j-1)}^{h(p-j)}{((A_jx_p+B_j)t^{1-\alpha} - A_jt^{2-\alpha})dt} =$$
-$$=
+\frac{d}{dx_{p}} \int\limits_{h(p-j-1)}^{h(p-j)}{((A_jx_p+B_j)t^{1-\alpha} - A_jt^{2-\alpha})dt} = \\ =
 \frac{d}{dx_{p}} \left. \left[ {(A_jx_p+B_j)\frac{t^{2-\alpha}}{2-\alpha} - A_j\frac{t^{3-\alpha}}{3-\alpha}} \right] \right|_{h(p-j-1)}^{h(p-j)} =
 A_j\frac{h^{2-\alpha}}{2-\alpha}\left[ (p-j)^{2-\alpha} - (p-j-1)^{2-\alpha} \right]
 $$
@@ -254,7 +253,7 @@ $$
 
 
 $${}_ +F_{i-\frac{1}{2}}^k =
-\sum_{j=0}^{i-2}{\left[ A_j \frac{h^{2-\alpha}}{2-\alpha}\left[ (i-j-\frac{1}{2})^{2-\alpha} - (i-j-\frac{3}{2})^{2-\alpha} \right] \right]} + A_{i-1}\frac{h^{2-\alpha}}{2-\alpha}\frac{1}{2^{2-\alpha}} = 
+\sum_{j=0}^{i-2}{\left[ A_j \frac{h^{2-\alpha}}{2-\alpha}\left[ (i-j-\frac{1}{2})^{2-\alpha} - (i-j-\frac{3}{2})^{2-\alpha} \right] \right]} + A_{i-1}\frac{h^{2-\alpha}}{2-\alpha}\frac{1}{2^{2-\alpha}}
 $$
 
 Выносим общие множители:
@@ -270,7 +269,7 @@ $$
 
 В промежуточном виде имеем:
 
-$$\left. \frac{\partial^\alpha}{\partial x^\alpha}u(x, t) \right|_{i} = 
+$$\left. \frac{\partial _ +^\alpha}{\partial x^\alpha}u(x, t) \right|_ {i} = 
 \frac{h^{1-\alpha}}{\Gamma(3-\alpha)2^{2-\alpha}} \cdot \left( \sum_{j=0}^{i-2}{\left[ A_j \left[ (2(i-j)+1)^{2-\alpha} -2(2(i-j)-1)^{2-\alpha} + (2(i-j)-3)^{2-\alpha} \right] \right]} + A_{i} + (3^{2-\alpha}-2)A_{i-1} \right)
 $$
 
@@ -282,7 +281,7 @@ $$G_k = G_0 \cdot ((2k+1)^{2-\alpha}-2(2k-1)^{2-\alpha}+(2k-3)^{2-\alpha}); k \g
 
 Получаем:
 
-$$\left. \frac{\partial^\alpha}{\partial x^\alpha}u(x, t) \right|_{i} = 
+$$\left. \frac{\partial _ +^\alpha}{\partial x^\alpha}u(x, t) \right|_ {i} = 
 \frac{1}{h^{\alpha - 1}} \cdot \left( \sum_{j=0}^{i-2}(A_j G_{i-j}) + G_0A_{i} + G_1A_{i-1} \right) = 
 \frac{1}{h^{\alpha}} \cdot \left( \sum_{j=0}^{i-2}((u_{j+1}^k-u_j^k) G_{i-j}) + G_0(u_{i+1}^k-u_i^k) + G_1(u_{i}^k-u_{i-1}^k) \right) = \\
 \frac{1}{h^{\alpha}} \cdot \left( \sum_{j=1}^{i-1}u_{j}^k G_{i-j+1} - \sum_{j=0}^{i-2}u_j^k G_{i-j} + G_0(u_{i+1}^k-u_i^k) + G_1(u_{i}^k-u_{i-1}^k) \right) = \\
@@ -291,7 +290,7 @@ $$
 
 Итого имеем:
 
-$$\left. \frac{\partial _+^\alpha}{\partial x^\alpha}u(x, t) \right|_{i} =
+$$\left. \frac{\partial _+^\alpha}{\partial x^\alpha}u(x, t) \right|_ {i} =
 \frac{1}{h^{\alpha}} \cdot \left(-G_{i} u^k_{0} + \sum_{j=1}^{i-2}u_{j}^k (G_{i-j+1} - G_{i-j}) + (G_2-G_1) u^k_{i-1} + (G_1-G_0) u_{i}^k + G_0 u_{i+1}^k \right)
 $$
 
@@ -329,7 +328,7 @@ $$
 
 Имеем по итогу для правой производной:
 
-$$\left. \frac{\partial _-^\alpha}{\partial x^\alpha}u(x, t) \right|_{i} =
+$$\left. \frac{\partial _-^\alpha}{\partial x^\alpha}u(x, t) \right|_ {i} =
 \frac{1}{h^{\alpha}} \cdot \left(-G_0 u^k_{i-1} + (G_0 - G_1) u^k_{i} + \sum_{j=i+1}^{n-1}u_{j}^k (G_{j-i} - G_{j-i+1}) + G_{n-i} u_{n}^k \right)
 $$
 
