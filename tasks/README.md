@@ -276,17 +276,32 @@ $$
 Введём следующие обозначения:
 
 $$
-G_0 = \frac{1}{\Gamma(3-\alpha)2^{2-\alpha}} \\
-G_1 = G_0 \cdot (3^{2-\alpha} - 2) \\
+G_0 = \frac{1}{\Gamma(3-\alpha)2^{2-\alpha}}
+$$
+
+$$
+G_1 = G_0 \cdot (3^{2-\alpha} - 2)
+$$
+
+$$
 G_k = G_0 \cdot ((2k+1)^{2-\alpha}-2(2k-1)^{2-\alpha}+(2k-3)^{2-\alpha}); k \geq 2
 $$
 
 Получаем:
 
 $$\left. \frac{\partial _ +^\alpha}{\partial x^\alpha}u(x, t) \right|_ {i} = 
-\frac{1}{h^{\alpha - 1}} \cdot \left( \sum_{j=0}^{i-2}(A_j G_{i-j}) + G_0A_{i} + G_1A_{i-1} \right) = 
-\frac{1}{h^{\alpha}} \cdot \left( \sum_{j=0}^{i-2}((u_{j+1}^k-u_j^k) G_{i-j}) + G_0(u_{i+1}^k-u_i^k) + G_1(u_{i}^k-u_{i-1}^k) \right) = \\
-\frac{1}{h^{\alpha}} \cdot \left( \sum_{j=1}^{i-1}u_{j}^k G_{i-j+1} - \sum_{j=0}^{i-2}u_j^k G_{i-j} + G_0(u_{i+1}^k-u_i^k) + G_1(u_{i}^k-u_{i-1}^k) \right) = \\
+\frac{1}{h^{\alpha - 1}} \cdot \left( \sum_{j=0}^{i-2}(A_j G_{i-j}) + G_0A_{i} + G_1A_{i-1} \right) =
+$$
+
+$$
+\frac{1}{h^{\alpha}} \cdot \left( \sum_{j=0}^{i-2}((u_{j+1}^k-u_j^k) G_{i-j}) + G_0(u_{i+1}^k-u_i^k) + G_1(u_{i}^k-u_{i-1}^k) \right) = 
+$$
+
+$$
+\frac{1}{h^{\alpha}} \cdot \left( \sum_{j=1}^{i-1}u_{j}^k G_{i-j+1} - \sum_{j=0}^{i-2}u_j^k G_{i-j} + G_0(u_{i+1}^k-u_i^k) + G_1(u_{i}^k-u_{i-1}^k) \right) =
+$$
+
+$$
 \frac{1}{h^{\alpha}} \cdot \left( \sum_{j=1}^{i-2}u_{j}^k (G_{i-j+1} - G_{i-j}) + G_{2} u^k_{i-1} - G_{i} u^k_{0} + G_0(u_{i+1}^k-u_i^k) + G_1(u_{i}^k-u_{i-1}^k) \right)
 $$
 
