@@ -275,9 +275,11 @@ $$
 
 Введём следующие обозначения:
 
-$$G_0 = \frac{1}{\Gamma(3-\alpha)2^{2-\alpha}}$$
-$$G_1 = G_0 \cdot (3^{2-\alpha} - 2)$$
-$$G_k = G_0 \cdot ((2k+1)^{2-\alpha}-2(2k-1)^{2-\alpha}+(2k-3)^{2-\alpha}); k \geq 2$$
+$$
+G_0 = \frac{1}{\Gamma(3-\alpha)2^{2-\alpha}} \\
+G_1 = G_0 \cdot (3^{2-\alpha} - 2) \\
+G_k = G_0 \cdot ((2k+1)^{2-\alpha}-2(2k-1)^{2-\alpha}+(2k-3)^{2-\alpha}); k \geq 2
+$$
 
 Получаем:
 
@@ -290,7 +292,7 @@ $$
 
 Итого имеем:
 
-$$\left. \frac{\partial _+^\alpha}{\partial x^\alpha}u(x, t) \right|_ {i} =
+$$\left. \frac{\partial _ +^\alpha}{\partial x^\alpha}u(x, t) \right|_ {i} =
 \frac{1}{h^{\alpha}} \cdot \left(-G_{i} u^k_{0} + \sum_{j=1}^{i-2}u_{j}^k (G_{i-j+1} - G_{i-j}) + (G_2-G_1) u^k_{i-1} + (G_1-G_0) u_{i}^k + G_0 u_{i+1}^k \right)
 $$
 
@@ -312,15 +314,15 @@ $$
 
 Для правой производной будет следующая формула:
 
-$$\left. \frac{\partial _-^\alpha}{\partial x^\alpha}u(x, t)\right|_ {i} = \frac{1}{\Gamma(2-\alpha)}\frac{d^2}{d x^2} \int\limits_{x}^{b}{\frac{u(s, t)}{(s-x)^{\alpha-1}}ds} = \frac{1}{\Gamma(2-\alpha)} \frac{{}_ -F_{i+\frac{1}{2}}^k - {}_ -F_{i-\frac{1}{2}}^k}{h}$$
+$$\left. \frac{\partial _ -^\alpha}{\partial x^\alpha}u(x, t)\right|_ {i} = \frac{1}{\Gamma(2-\alpha)}\frac{d^2}{d x^2} \int\limits_{x}^{b}{\frac{u(s, t)}{(s-x)^{\alpha-1}}ds} = \frac{1}{\Gamma(2-\alpha)} \frac{{}_ -F_{i+\frac{1}{2}}^k - {}_ -F_{i-\frac{1}{2}}^k}{h}$$
 
-$${}_ -F_{i+\frac{1}{2}}^k = -\frac{d}{dx_{i+\frac{1}{2}}} \int\limits^{b}_{x_{i+\frac{1}{2}}}{\frac{u(s, t)}{(s-x_{i+\frac{1}{2}})^{\alpha-1}}ds} = \frac{d}{dx_{i+\frac{1}{2}}} 
+$${}_ -F_{i+\frac{1}{2}}^k = -\frac{d}{dx_{i+\frac{1}{2}}} \int\limits^{b}_ {x_{i+\frac{1}{2}}}{\frac{u(s, t)}{(s-x_{i+\frac{1}{2}})^{\alpha-1}}ds} = \frac{d}{dx_{i+\frac{1}{2}}} 
 \left[ 
     \sum_{j=i+1}^{n-1}{\int\limits_{x_j}^{x_{j+1}}{\frac{A_js+B_j}{(s-x_{i+\frac{1}{2}})^{\alpha-1}}ds}} + \int\limits_{x_i+\frac{1}{2}}^{x_{i+1}}{\frac{A_is+B_i}{(s-x_{i+\frac{1}{2}})^{\alpha-1}}ds} 
 \right]
 $$
 
-$${}_ -F_{i-\frac{1}{2}}^k = -\frac{d}{dx_{i-\frac{1}{2}}} \int\limits^{b}_{x_{i-\frac{1}{2}}}{\frac{u(s, t)}{(s-x_{i-\frac{1}{2}})^{\alpha-1}}ds} = \frac{d}{dx_{i-\frac{1}{2}}} 
+$${}_ -F_{i-\frac{1}{2}}^k = -\frac{d}{dx_{i-\frac{1}{2}}} \int\limits^{b}_ {x_{i-\frac{1}{2}}}{\frac{u(s, t)}{(s-x_{i-\frac{1}{2}})^{\alpha-1}}ds} = \frac{d}{dx_{i-\frac{1}{2}}} 
 \left[ 
     \sum_{j=i}^{n-1}{\int\limits_{x_j}^{x_{j+1}}{\frac{A_js+B_j}{(s-x_{i-\frac{1}{2}})^{\alpha-1}}ds}} + \int\limits_{x_{i-\frac{1}{2}}}^{x_{i}}{\frac{A_{i-1}s+B_{i-1}}{(s-x_{i-\frac{1}{2}})^{\alpha-1}}ds} 
 \right]
@@ -328,7 +330,7 @@ $$
 
 Имеем по итогу для правой производной:
 
-$$\left. \frac{\partial _-^\alpha}{\partial x^\alpha}u(x, t) \right|_ {i} =
+$$\left. \frac{\partial _ -^\alpha}{\partial x^\alpha}u(x, t) \right|_ {i} =
 \frac{1}{h^{\alpha}} \cdot \left(-G_0 u^k_{i-1} + (G_0 - G_1) u^k_{i} + \sum_{j=i+1}^{n-1}u_{j}^k (G_{j-i} - G_{j-i+1}) + G_{n-i} u_{n}^k \right)
 $$
 
