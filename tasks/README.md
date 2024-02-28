@@ -231,14 +231,17 @@ $${}_ +F_{i-\frac{1}{2}}^k = \frac{d}{dx_{i-\frac{1}{2}}} \int\limits_{a}^{x_{i-
 \right]
 $$
 
-$A_j = \frac{u_{j+1}^k - u_j^k}{h} $
+где $A_j = \frac{u_{j+1}^k - u_j^k}{h} $.
 
 ---
 
 $$
 \frac{d}{dx_{p}} \int\limits_{x_j}^{x_{j+1}}{\frac{A_js+B_j}{(x_{p}-s)^{\alpha-1}}ds} \overset{(1)}{=} 
 \frac{d}{dx_{p}} \int\limits_{h(p-j-1)}^{h(p-j)}{\frac{A_j(x_p - t)+B_j}{t^{\alpha-1}}dt} =
-\frac{d}{dx_{p}} \int\limits_{h(p-j-1)}^{h(p-j)}{((A_jx_p+B_j)t^{1-\alpha} - A_jt^{2-\alpha})dt} = \\ =
+\frac{d}{dx_{p}} \int\limits_{h(p-j-1)}^{h(p-j)}{((A_jx_p+B_j)t^{1-\alpha} - A_jt^{2-\alpha})dt} =
+$$
+
+$$=
 \frac{d}{dx_{p}} \left. \left[ {(A_jx_p+B_j)\frac{t^{2-\alpha}}{2-\alpha} - A_j\frac{t^{3-\alpha}}{3-\alpha}} \right] \right|_{h(p-j-1)}^{h(p-j)} =
 A_j\frac{h^{2-\alpha}}{2-\alpha}\left[ (p-j)^{2-\alpha} - (p-j-1)^{2-\alpha} \right]
 $$
