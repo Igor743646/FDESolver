@@ -32,12 +32,12 @@ namespace NEquationSolver {
             DEBUG_LOG << std::format("n: {} k: {} count: {}", n, k, count) << Endl;
 
             NLinalg::TMatrix result(k + 1, n + 1, 0.0);
-            NLinalg::TMatrix probabilities(n + 1, 2 * n + 2 + k, 0.0);
-            NLinalg::TMatrix prefsumProbs(n + 1, 2 * n + 2 + k, 0.0);
+            NLinalg::TMatrix probabilities(n - 1, 2 * n + 2 + k, 0.0);
+            NLinalg::TMatrix prefsumProbs(n - 1, 2 * n + 2 + k, 0.0);
 
-            for (usize i = 0; i <= n; i++) {
+            for (usize i = 0; i < n - 1; i++) {
                 for (usize p = 0; p < 2 * n + 2 + k; p++) {
-                    probabilities[i][p] = TFiller::FillProbabilities(this, probabilities, i, p);
+                    probabilities[i][p] = TFiller::FillProbabilities(this, probabilities, i + 1, p);
                 }
                 std::inclusive_scan(probabilities[i], probabilities[i + 1], prefsumProbs[i]);
             }
@@ -71,7 +71,7 @@ namespace NEquationSolver {
 
                         while (y > 0 && x < n && x > 0) {
                             f64 rnd = randoms[rnd_id + y - 1];
-                            i64 idx = std::lower_bound(prefsumProbs[x], prefsumProbs[x + 1], rnd) - prefsumProbs[x];
+                            i64 idx = std::lower_bound(prefsumProbs[x-1], prefsumProbs[x], rnd) - prefsumProbs[x-1];
 
                             sf += SourceFunction[y][x];
 

@@ -219,11 +219,6 @@ def draw(results : Results, arguments : argparse.Namespace):
     draw_surface(results.config, results)
     plt.savefig(outputs['SS'])
 
-    gif = draw_slices_gif(results.config, results)
-    FFwriter = animation.FFMpegWriter(fps=60)
-    gif.save(outputs["DS"] + ".mp4", writer = FFwriter)
-    gif.save(outputs["DS"] + ".gif", fps=60)
-
     if arguments.time_slice is not None:
         draw_time_slice(results.config, 
                         np.clip(arguments.time_slice, 0, results.config.TimeCount), 
@@ -233,6 +228,11 @@ def draw(results : Results, arguments : argparse.Namespace):
     if results.real_solution is not None:
         draw_error(results.config, results)
         plt.savefig(outputs['ER'])
+
+    gif = draw_slices_gif(results.config, results)
+    FFwriter = animation.FFMpegWriter(fps=60)
+    gif.save(outputs["DS"] + ".mp4", writer = FFwriter)
+    gif.save(outputs["DS"] + ".gif", fps=60)
 
     if arguments.verbose:
         for task in results.results:

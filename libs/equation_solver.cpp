@@ -60,33 +60,30 @@ namespace NEquationSolver {
     }
 
     IEquationSolver::IEquationSolver(const TSolverConfig& config) : Config(config) {
-        Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep);
-        Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep);
+        Init();
         PrefetchData();
         Validate();
     }
 
     IEquationSolver::IEquationSolver(TSolverConfig&& config) : Config(std::move(config)) {
+        Init();
+        PrefetchData();
+        Validate();
+    }
+
+    IEquationSolver::IEquationSolver(const IEquationSolver& solver) : IEquationSolver(solver.Config) {}
+    IEquationSolver::IEquationSolver(IEquationSolver&& solver) : IEquationSolver(std::move(solver.Config)) {}
+
+    void IEquationSolver::Init() {
         Config.SpaceCount = static_cast<usize>((Config.RightBound - Config.LeftBound) / Config.SpaceStep);
         Config.TimeCount = static_cast<usize>(Config.MaxTime / Config.TimeStep);
-        PrefetchData();
-        Validate();
-    }
-
-    IEquationSolver::IEquationSolver(const IEquationSolver& solver) : Config(solver.Config) {
-        PrefetchData();
-        Validate();
-    }
-
-    IEquationSolver::IEquationSolver(IEquationSolver&& solver) : Config(std::move(solver.Config)) {
-        PrefetchData();
-        Validate();
+        PowTCGamma = std::pow(Config.TimeStep, Config.Gamma);
+        PowSCAlpha = std::pow(Config.SpaceStep, Config.Alpha);
     }
 
     void IEquationSolver::PrefetchData() {
-        GAlpha.resize(Config.SpaceCount + 2);
-        GGamma.resize(Config.TimeCount + 2);
-        GAlpha[0] = GGamma[0] = 1.0;
+        GAlpha.resize(Config.SpaceCount + 2, 1.0);
+        GGamma.resize(Config.TimeCount + 2, 1.0);
 
         for (usize i = 1; i < Config.SpaceCount + 2; i++) {
             GAlpha[i] = (static_cast<f64>(i) - 1.0 - Config.Alpha) / static_cast<f64>(i) * GAlpha[i - 1];
@@ -95,9 +92,6 @@ namespace NEquationSolver {
         for (usize i = 1; i < Config.TimeCount + 2; i++) {
             GGamma[i] = (static_cast<f64>(i) - 1.0 - Config.Gamma) / static_cast<f64>(i) * GGamma[i - 1];
         }
-
-        PowTCGamma = std::pow(Config.TimeStep, Config.Gamma);
-        PowSCAlpha = std::pow(Config.SpaceStep, Config.Alpha);
 
         DiffusionCoefficient.resize(Config.SpaceCount+1);
         DemolitionCoefficient.resize(Config.SpaceCount+1);
@@ -127,16 +121,7 @@ namespace NEquationSolver {
     }
 
     f64 IEquationSolver::CoefG(f64 a, usize i) const {
-        if (a != Config.Alpha && a != Config.Gamma) {
-            throw "ERROR: g function using memoization only for \"alpha\" and \"gamma\". If you need more use comments below\n";
-
-            /*
-                if (std::abs(a) - (ull)std::abs(a) < 0.000001 && i >= a + 1) {
-                    return 0.0;
-                }
-                return (i % 2 == 0 ? 1 : -1) / (a + 1) / BETA((f64)i + 1.0, a - (f64)i + 1.0);
-            */
-        }
+        assert((a == Config.Alpha) || (a == Config.Gamma));
 
         if (a == Config.Alpha) {
             assert(i < GAlpha.size());

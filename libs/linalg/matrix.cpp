@@ -247,7 +247,7 @@ namespace NLinalg {
 
     std::ostream& operator<<(std::ostream& out, const TMatrix& m) {
         out << std::fixed;
-        out.precision(2);
+        out.precision(9);
         out << "[";
         for (usize i = 0; i < m.Rows; i++) {
             out << ((i == 0) ? "[" : " [");

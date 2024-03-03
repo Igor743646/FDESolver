@@ -68,7 +68,7 @@ namespace NEquationSolver {
             return -solver->CoefGGamma(p - 2 * n + 1);
         } 
 
-        return 1.0 - std::accumulate(probabilities[i], probabilities[i + 1], 0.0);
+        return 1.0 - std::accumulate(probabilities[i - 1], probabilities[i], 0.0);
     }
 
     /*
@@ -106,7 +106,7 @@ namespace NEquationSolver {
             if (i == j + 1) {
                 result += solver->CoefB(i) * CoefGMatrix(solver, 0);
             } else if (j == n && i < n) {
-                result -= solver->CoefB(i) * CoefGMatrix(solver, n - j);
+                result -= solver->CoefB(i) * CoefGMatrix(solver, n - i);
             } else {
                 result += solver->CoefB(i) * (CoefGMatrix(solver, j - i + 1) - CoefGMatrix(solver, j - i));
             }
@@ -128,8 +128,8 @@ namespace NEquationSolver {
     }
 
     /*
-        // Math: \theta_0 = \frac{1}{(1-\alpha)\Gamma(1-\alpha)}
-        // Math: \theta_k = \theta_0 * (k^{1-\alpha} - (k-1)^{1-\alpha})
+        // Math: \theta_0 = \frac{1}{(1-\gamma)\Gamma(1-\gamma)}
+        // Math: \theta_k = \theta_0 * (k^{1-\gamma} - (k-1)^{1-\gamma})
     */
     f64 TRLFDESRule::CoefGDestination(IEquationSolver const *const solver, usize k) {
         const f64 gamma = solver->GetConfig().Gamma;
@@ -159,8 +159,54 @@ namespace NEquationSolver {
     }
 
     f64 TRLFDESRule::FillProbabilities(IEquationSolver const *const solver, const NLinalg::TMatrix& probabilities, usize i, usize p) {
-        
-        UNIMPLEMENTED("Can not fill probs");
+        const usize n = solver->GetConfig().SpaceCount;
+        const usize k = solver->GetConfig().TimeCount;
+        const double alpha = solver->GetConfig().Alpha;
+        const double gamma = solver->GetConfig().Gamma;
+
+        if (p == n) {
+            return ((CoefGMatrix(solver, 1) - CoefGMatrix(solver, 0)) * (solver->CoefA(i) + solver->CoefB(i)) + (CoefGDestination(solver, 0) - CoefGDestination(solver, 2))) / CoefGDestination(solver, 0);
+        }
+        if (p == n - 1) {
+            double result = (CoefGMatrix(solver, 0) * solver->CoefA(i) + (CoefGMatrix(solver, 2) - CoefGMatrix(solver, 1)) * solver->CoefB(i) + solver->CoefC(i)) / CoefGDestination(solver, 0);
+            if (i == n - 1) {
+                result -= (CoefGMatrix(solver, 2) * solver->CoefB(i)) / CoefGDestination(solver, 0);
+            }
+            return result;
+        }
+        if (p == n + 1) {
+            double result = ((CoefGMatrix(solver, 2) - CoefGMatrix(solver, 1)) * solver->CoefA(i) + CoefGMatrix(solver, 0) * solver->CoefB(i) - solver->CoefC(i)) / CoefGDestination(solver, 0);
+            if (i == 1) {
+                result -= (CoefGMatrix(solver, 2) * solver->CoefA(i)) / CoefGDestination(solver, 0);
+            }
+            return result;
+        } 
+
+        if (i <= p && p < n - 1) {
+            if (p == i) {
+                return -CoefGMatrix(solver, n - p) * solver->CoefB(i) / CoefGDestination(solver, 0); 
+            }
+            return (CoefGMatrix(solver, n - p + 1) - CoefGMatrix(solver, n - p)) * solver->CoefB(i) / CoefGDestination(solver, 0); 
+        }
+
+        if (n + 1 < p && p <= n + i) {
+            if (p == n + i) {
+                return -CoefGMatrix(solver, p - n) * solver->CoefA(i) / CoefGDestination(solver, 0);
+            }
+            return (CoefGMatrix(solver, p - n + 1) - CoefGMatrix(solver, p - n)) * solver->CoefA(i) / CoefGDestination(solver, 0);
+        }
+
+        if (2 * n < p && p <= 2 * n + k) {
+            if (p == 2 * n + k) {
+                return CoefGDestination(solver, p - 2 * n + 2) / CoefGDestination(solver, 0);
+            }
+            return (CoefGDestination(solver, p - 2 * n + 1) - CoefGDestination(solver, p - 2 * n + 2)) / CoefGDestination(solver, 0);
+        }
+
+        if (p == 2 * n + k + 1) {
+            return 1.0 - std::accumulate(probabilities[i - 1], probabilities[i], 0.0);
+        }
+
         return 0.0;
     }
 }

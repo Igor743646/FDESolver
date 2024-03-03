@@ -89,10 +89,10 @@ int main(int argc, char** argv) {
             .SpaceStep = 0.052,
             .TimeStep = 0.01,
             .Beta = 1.0,
-            .DiffusionCoefficient = [alpha](f64 x){ return NFunctions::Gamma(3.0 - alpha) / NFunctions::Gamma(3.0) * std::pow(x, alpha); },
+            .DiffusionCoefficient = [alpha](f64 x){ return 0.0001 * NFunctions::Gamma(3.0 - alpha) / NFunctions::Gamma(3.0) * std::pow(x, alpha); },
             .DemolitionCoefficient = [](f64 x){ return 0.0; },
             .ZeroTimeState = [](f64 x){ return 0.0; },
-            .SourceFunction = [gamma](f64 x, f64 t){ return NFunctions::Gamma(3.0) / NFunctions::Gamma(3.0 - gamma) * (std::pow(t, 2.0 - gamma) * std::pow(x, 2.0)) - std::pow(x, 2.0) * std::pow(t, 2.0); },
+            .SourceFunction = [gamma](f64 x, f64 t){ return NFunctions::Gamma(3.0) / NFunctions::Gamma(3.0 - gamma) * (std::pow(t, 2.0 - gamma) * std::pow(x, 2.0)) - 0.0001 * std::pow(x, 2.0) * std::pow(t, 2.0); },
             .LeftBoundState = [](f64 t){ return 0.0; },
             .RightBoundState = [](f64 t){ return std::pow(t, 2.0); },
             .BordersAvailable = true,
@@ -104,6 +104,7 @@ int main(int argc, char** argv) {
         TMatrixFDES<TMFDESRule> solver1(config);
         TMatrixFDES<TRLFDESRule> solver2(config);
         TStochasticFDES<TMFDESRule> solver3(config);
+        TStochasticFDES<TRLFDESRule> solver4(config);
 
         PFDESolver::TResults results;
         results.set_allocated_task(new PFDESolver::TSolverConfig(config.ToProto()));
@@ -111,6 +112,7 @@ int main(int argc, char** argv) {
         SolveTaskAndSave(solver1, results, true, true);
         SolveTaskAndSave(solver2, results, true, true);
         SolveTaskAndSave(solver3, results, true, true);
+        SolveTaskAndSave(solver4, results, true, true);
 
         if (!SaveResultsToFile("result1.bin", results)) {
             ERROR_LOG << "Crushed saving" << Endl;
@@ -130,8 +132,8 @@ int main(int argc, char** argv) {
             .SpaceStep = 0.1,
             .TimeStep = 0.0001,
             .Beta = 1.0,
-            .DiffusionCoefficient = [alpha, a](f64 x){ return NFunctions::Gamma(2.0 - alpha) * std::pow(x - a, alpha) * (std::log(x - a) + 1); },
-            .DemolitionCoefficient = [alpha, a](f64 x){ return (a - x) * (std::log(x - a) + std::lgamma(2) - std::lgamma(2.0 - alpha)); },
+            .DiffusionCoefficient = [alpha, a](f64 x){ return 0.001 * NFunctions::Gamma(2.0 - alpha) * std::pow(x - a, alpha) * (std::log(x - a) + 1); },
+            .DemolitionCoefficient = [alpha, a](f64 x){ return 0.001 * (a - x) * (std::log(x - a) + std::lgamma(2) - std::lgamma(2.0 - alpha)); },
             .ZeroTimeState = [](f64 x){ return 0.0; },
             .SourceFunction = [gamma, a](f64 x, f64 t){ return 1.0 / NFunctions::Gamma(2.0 - gamma) * (x - a) * std::log(x - a) * std::pow(t, 1 - gamma); },
             .LeftBoundState = [](f64 t){ return 0.0; },
@@ -145,6 +147,7 @@ int main(int argc, char** argv) {
         TMatrixFDES<TMFDESRule> solver1(config);
         TMatrixFDES<TRLFDESRule> solver2(config);
         TStochasticFDES<TMFDESRule> solver3(config);
+        TStochasticFDES<TRLFDESRule> solver4(config);
 
         PFDESolver::TResults results;
         results.set_allocated_task(new PFDESolver::TSolverConfig(config.ToProto()));
@@ -152,6 +155,7 @@ int main(int argc, char** argv) {
         SolveTaskAndSave(solver1, results, true, true);
         SolveTaskAndSave(solver2, results, true, true);
         SolveTaskAndSave(solver3, results, true, true);
+        SolveTaskAndSave(solver4, results, true, true);
 
         if (!SaveResultsToFile("result2.bin", results)) {
             ERROR_LOG << "Crushed saving" << Endl;
@@ -168,7 +172,7 @@ int main(int argc, char** argv) {
             .SpaceStep = 0.02,
             .TimeStep = 0.001,
             .Beta = 0.5,
-            .DiffusionCoefficient = [](f64 x){ return .1; },
+            .DiffusionCoefficient = [](f64 x){ return .001; },
             .DemolitionCoefficient = [](f64 x){ return 0.0; },
             .ZeroTimeState = [](f64 x){ return -0.01 < x && x < 0.01 ? 50.0 : 0.0; },
             .SourceFunction = [](f64 x, f64 t){ return 0.0; },
@@ -181,6 +185,7 @@ int main(int argc, char** argv) {
         TMatrixFDES<TMFDESRule> solver1(config);
         TMatrixFDES<TRLFDESRule> solver2(config);
         TStochasticFDES<TMFDESRule> solver3(config);
+        TStochasticFDES<TRLFDESRule> solver4(config);
 
         PFDESolver::TResults results;
         results.set_allocated_task(new PFDESolver::TSolverConfig(config.ToProto()));
@@ -188,6 +193,7 @@ int main(int argc, char** argv) {
         SolveTaskAndSave(solver1, results, true, true);
         SolveTaskAndSave(solver2, results, true, true);
         SolveTaskAndSave(solver3, results, true, true);
+        SolveTaskAndSave(solver4, results, true, true);
 
         if (!SaveResultsToFile("result3.bin", results)) {
             ERROR_LOG << "Crushed saving" << Endl;

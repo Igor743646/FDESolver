@@ -66,6 +66,7 @@ namespace NEquationSolver {
     private:
 
         void PrefetchData();
+        void Init();
 
     public:
 
@@ -87,14 +88,7 @@ namespace NEquationSolver {
         IEquationSolver(IEquationSolver&&);
         virtual ~IEquationSolver();
 
-        /// @brief Возвращает x координату
-        /// @param  i номер шага по пространственной координате
-        /// @return x(i) = LeftBound + i * SpaceStep
-        f64 Space(usize) const ;
-
-        /// @brief Возвращает t координату
-        /// @param  j номер шага по временной координате
-        /// @return t(j) = j * TimeStep
+        f64 Space(usize) const;
         f64 Time(usize) const;
         f64 CoefA(f64) const;
         f64 CoefB(f64) const;
@@ -114,11 +108,7 @@ namespace NEquationSolver {
         virtual void Validate() const final;
 
         friend std::ostream& operator<<(std::ostream& out, const IEquationSolver& solver) {
-
             out << "Parameters:\n" << solver.Config << Endl;
-            out << "GAlpha:\n" << solver.GAlpha << Endl;
-            out << "GGamma:\n" << solver.GGamma << Endl;
-
             return out;
         }
     };
