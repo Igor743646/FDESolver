@@ -1,4 +1,8 @@
 # FDESolver
+
+> [!IMPORTANT] 
+This is an outdated part of the project, see the new version here: https://github.com/Igor743646/FDESolverServer
+
 Solver of anomalous diffusion differential equation.
 
 Task:
@@ -23,3 +27,5 @@ $$
 $$
 \alpha \in (1; 2); \gamma \in (0; 1); \beta \in [-1; 1]
 $$
+
+
